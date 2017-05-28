@@ -96,6 +96,7 @@ RSpec.describe 'Promotions API', type: :request do
       byebug
       post '/api/v1/promotions', params: default_single_params, headers: authorization_header
 
+      # TODO change to 422
       expect(response).to have_http_status(401)
 
       expect(json['errors']['title']).to eq('Single Promotoins require a promocode string')

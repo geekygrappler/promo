@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170528101326) do
+ActiveRecord::Schema.define(version: 20170528162633) do
 
   create_table "api_keys", force: :cascade do |t|
     t.string "access_token"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 20170528101326) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "type"
+    t.string "constraints"
     t.index ["user_id"], name: "index_promotions_on_user_id"
   end
 

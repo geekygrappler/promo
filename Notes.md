@@ -164,21 +164,34 @@ How to write the code to do this and how to message to Users?
 What is a constraint?
 A pre-condition that must be met in order to apply a promotion.
 
-**Specific Customer:** Must match the email of the customer who owns the promocode. (usually paired with Multiple promocode promotions, but don't want to constrain it to that, be flexible)
+They can live in different places. (not sure about this, maybe they should
+live in one place and be applied without caring, I think I'm coupling)
+
+On the promocode
+
+On the promotion
+
+**Specific Customer (Promocode):** Must match the email of the customer who owns the promocode. 
+(usually paired with Multiple promocode promotions, but don't want to constrain it to that, be flexible)
 
 The default is for any customer to be able to use a promocode.
 
-**Single Redemption:** Can only be redeemed once.
+**Unique Customer Generation (Promotion):** Can only be generated once per customer email.
+
+**Single Redemption (Promocode):** Promocode can only be redeemed once.
 
 The default is for a promocode to be redeemable unlimited times.
 
-**Promotion Period:** Promotions have start and end date during which they can be redeemed.
+**Unique Customer Redemption (Promotion via redemptions):** A customer can only redeem the code once. e.g. can be redeemed
+multiple times, but only once by each user. SUMMER 10
 
-**Minimum Basket Total:** Minimum total for a basket
+**Promotion Period (Promotion):** Promotions have start and end date during which they can be redeemed.
 
-**Basket Contains:** some sketchy regex on item description.
+**Minimum Basket Total (Promotion):** Minimum total for a basket
 
-**Customer Group:** email domain regex
+**Basket Contains (Promotion needs something more):** some sketchy regex on item description.
+
+**Customer Group (Promotion):** email domain regex
 
 *N.B. More to be added maybe? We want to keep this list as short as possible while
 covering as many use cases as possible*

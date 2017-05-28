@@ -46,6 +46,10 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
     end
 
     describe 'for specific customer' do
+      before(:each) do
+        @promotion.add_constraint "SpecificCustomer"
+        @promotion.save
+      end
       it 'should generate a new promocode with a customer email' do
         params = {
             data: {
@@ -65,10 +69,11 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
 
         expect(json['data']['attributes']['customer_email']).to eq(promocode.customer_email)
       end
-      xit 'should respond with an error if no customer email is provided' do
+
+      it 'should respond with an error if no customer email is provided' do
         params = {
             data: {
-                type: 'generate-promocode-request',
+                type: 'promocodes',
                 attributes: {
                     'promotion-id': @promotion.id
                 }
@@ -77,14 +82,9 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
 
         post '/api/v1/generate', params: params, headers: authorization_header
 
-        expect(response).to have_http_status(201)
+        expect(response).to have_http_status(422)
 
-        promocode = Promocode.first
-
-        expect(Promocode.all.count).to eq(1)
-        expect(promocode.promotion).to eq(@promotion)
-        expect(json['data']['id'].to_i).to eq(promocode.id)
-        expect(json['data']['attributes']['code']).to eq(promocode.code)
+        expect(json['errors']['title']).to eq('This promotion requires a customer email address')
       end
       xit 'should repsond with an error if the customer already has a promocode' do
 
