@@ -1,8 +1,10 @@
 class Api::V1::PromotionsController < ApplicationController
+  include Authorisation
+
   before_action :set_user_from_access_token, only: [:create]
+  before_action :create_promotion, only: [:create]
 
   def create
-    @promotion = Promotion.new(promotion_params)
     @promotion.user = @user
     if @promotion.save
       render json: @promotion, status: :created
@@ -14,20 +16,18 @@ class Api::V1::PromotionsController < ApplicationController
   private
 
   def promotion_params
-    params.require(:data).require(:attributes).permit(:name, :start_date, :end_date)
+    params.require(:data).require(:attributes).permit(:name, :start_date, :end_date, :promotion_type)
   end
 
-  def set_user_from_access_token
-    api_key = ApiKey.find_by(access_token: request.headers['Authorization'])
-
-    if api_key.nil?
-      render json: {
-        errors: {
-          title: 'API key is not valid'
-        }
-      }, status: :unauthorized
+  def create_promotion
+    if (promotion_params[:promotion_type] === 'single')
+      single_params = promotion_params
+      single_params.delete('promotion_type')
+      @promotion = Single.new(single_params)
     else
-      @user = api_key.user
+      multiple_params = promotion_params
+      multiple_params.delete('promotion_type')
+      @promotion = Multiple.new(multiple_params)
     end
   end
 end

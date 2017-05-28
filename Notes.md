@@ -155,6 +155,8 @@ There are two types of Promotion
 
 **Multiple promocode:** Multiple promocodes, usually generated via the api e.g. 'xy382euu' generated on newsletter signup.
 
+*N.B Multiple Promocodes do not necessarily need to be tied to a customers email.*
+
 How to write the code to do this and how to message to Users?
 
 ### Constraints

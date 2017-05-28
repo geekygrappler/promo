@@ -1,6 +1,8 @@
 require 'rails_helper'
 require 'date'
 
+
+## TODO this route shoul
 RSpec.describe 'Promotions API', type: :request do
 
   # Constants for tests
@@ -30,7 +32,6 @@ RSpec.describe 'Promotions API', type: :request do
 
   describe 'token access' do
     it 'creates a promotion when a valid access_token is provided' do
-
       post '/api/v1/promotions', params: default_params, headers: authorization_header
 
       expect(response).to have_http_status(201)
@@ -75,4 +76,31 @@ RSpec.describe 'Promotions API', type: :request do
       expect(Time.parse(json['data']['attributes']['start-date']).to_s).to eq(Time.now.utc.to_s)
     end
   end
+
+  xdescribe'creating a "Single" promotion' do
+
+    let(:default_single_params) {
+      default_params[:data][:attributes][:promotion_type] = 'single'
+      return default_params
+    }
+
+    it 'should create a Single promotion' do
+      post '/api/v1/promotions', params: default_single_params, headers: authorization_header
+
+      expect(response).to have_http_status(201)
+
+      expect(json['data']['attributes']['promotion-type']).to eq('Single')
+    end
+
+    it 'should require a user defined promocode string' do
+      byebug
+      post '/api/v1/promotions', params: default_single_params, headers: authorization_header
+
+      expect(response).to have_http_status(401)
+
+      expect(json['errors']['title']).to eq('Single Promotoins require a promocode string')
+    end
+  end
+
+  describe 'creating a "Multiple Promotion"'
 end
