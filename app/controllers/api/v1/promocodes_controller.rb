@@ -10,10 +10,10 @@ class Api::V1::PromocodesController < ApplicationController
     @promocode = @promotion.generate_promocode(promocode_params['customer-email'])
 
     # Pretty horrible
-    if @promocode.is_a?(String)
+    if @promocode.is_a?(ConstraintError)
         render json: {
             errors: {
-                title: 'This promotion requires a customer email address'
+                title: @promocode.message
             }
         }, status: :unprocessable_entity
     else

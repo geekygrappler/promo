@@ -86,7 +86,7 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
         expect(json['errors']['title']).to eq('This promotion requires a customer email address')
       end
 
-      xit 'should respond with an error if the customer already has a promocode and the promotion is restricted to
+      it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
             once per customer' do
         @promotion.add_constraint "UniqueCustomerGeneration"
         @promotion.save
@@ -97,7 +97,7 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
                 type: 'generate-promocode-request',
                 attributes: {
                     'promotion-id': @promotion.id,
-                    'customer-email': customer_email
+                    'customer-email': 'billy@blogs.com'
                 }
             }
         }
