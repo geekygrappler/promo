@@ -1,3 +1,3 @@
 class PromocodeSerializer < ActiveModel::Serializer
-  attributes :code
+  attributes :code, :customer_email
 end

@@ -7,7 +7,7 @@ class Api::V1::PromocodesController < ApplicationController
   # Generate a promocode for a Multiple Promotion
   def generate
     @promotion = Promotion.find(promocode_params['promotion-id'])
-    @promocode = @promotion.generate_promocode(promocode_params[:customer_email])
+    @promocode = @promotion.generate_promocode(promocode_params['customer-email'])
 
     # Pretty horrible
     if @promocode.is_a?(String)
@@ -28,6 +28,6 @@ class Api::V1::PromocodesController < ApplicationController
 
   private
   def promocode_params
-    params.require(:data).require(:attributes).permit('promotion-id', :customer_email)
+    params.require(:data).require(:attributes).permit('promotion-id', 'customer-email')
   end
 end
