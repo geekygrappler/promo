@@ -2,7 +2,6 @@ require 'rails_helper'
 require 'date'
 
 
-## TODO this route shoul
 RSpec.describe 'Promotions API', type: :request do
 
   # Constants for tests
@@ -29,7 +28,7 @@ RSpec.describe 'Promotions API', type: :request do
     }
   }
 
-
+  # TODO move to an authorisation test file. Not related to the promotions endpoint.
   describe 'token access' do
     it 'creates a promotion when a valid access_token is provided' do
       post '/api/v1/promotions', params: default_params, headers: authorization_header

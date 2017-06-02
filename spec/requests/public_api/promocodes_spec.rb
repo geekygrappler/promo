@@ -1,36 +1,36 @@
 require 'rails_helper'
 
 RSpec.describe 'Promocode public endpoint -', type: :request do
-  let(:promotion_name) { 'Test' }
-  let(:start_date) { DateTime.now.utc.iso8601 }
-  let(:end_date) { (DateTime.now + 60).utc.iso8601 }
-  let(:user) { User.create(email: 'test@test.com')}
-  let(:api_key) { ApiKey.create(user: user)}
-  let(:customer_email) { 'customer@test.com' }
+  let(:promotion_name) {'Test'}
+  let(:start_date) {DateTime.now.utc.iso8601}
+  let(:end_date) {(DateTime.now + 60).utc.iso8601}
+  let(:user) {User.create(email: 'test@test.com')}
+  let(:api_key) {ApiKey.create(user: user)}
   let(:authorization_header) {
     {
-        'Authorization': api_key.access_token
+      'Authorization': api_key.access_token
     }
   }
+  let(:customer_email) {'customer@test.com'}
 
   before(:each) do
     @promotion = Multiple.create(
-        name: promotion_name,
-        start_date: start_date,
-        end_date: end_date,
-        user: user
+      name: promotion_name,
+      start_date: start_date,
+      end_date: end_date,
+      user: user
     )
   end
 
   describe 'Generate Promocode for Multiple Promotions' do
     it 'should generate a new promocode' do
       params = {
-          data: {
-              type: 'generate-promocode-request',
-              attributes: {
-                  'promotion-id': @promotion.id
-              }
+        data: {
+          type: 'generate-promocode-request',
+          attributes: {
+            'promotion-id': @promotion.id
           }
+        }
       }
 
       post '/api/v1/generate', params: params, headers: authorization_header
@@ -47,18 +47,18 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
 
     describe 'for specific customer' do
       before(:each) do
-        @promotion.add_constraint "SpecificCustomer"
+        @promotion.add_constraint 'SpecificCustomer'
         @promotion.save
       end
       it 'should generate a new promocode with a customer email' do
         params = {
-            data: {
-                type: 'generate-promocode-request',
-                attributes: {
-                    'promotion-id': @promotion.id,
-                    'customer-email': customer_email
-                }
+          data: {
+            type: 'generate-promocode-request',
+            attributes: {
+              'promotion-id': @promotion.id,
+              'customer-email': customer_email
             }
+          }
         }
 
         post '/api/v1/generate', params: params, headers: authorization_header
@@ -71,12 +71,12 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
 
       it 'should respond with an error if no customer email is provided' do
         params = {
-            data: {
-                type: 'promocodes',
-                attributes: {
-                    'promotion-id': @promotion.id
-                }
+          data: {
+            type: 'promocodes',
+            attributes: {
+              'promotion-id': @promotion.id
             }
+          }
         }
 
         post '/api/v1/generate', params: params, headers: authorization_header
@@ -88,18 +88,18 @@ RSpec.describe 'Promocode public endpoint -', type: :request do
 
       it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
             once per customer' do
-        @promotion.add_constraint "UniqueCustomerGeneration"
+        @promotion.add_constraint 'UniqueCustomerGeneration'
         @promotion.save
         @promotion.generate_promocode('billy@blogs.com').save
 
         params = {
-            data: {
-                type: 'generate-promocode-request',
-                attributes: {
-                    'promotion-id': @promotion.id,
-                    'customer-email': 'billy@blogs.com'
-                }
+          data: {
+            type: 'generate-promocode-request',
+            attributes: {
+              'promotion-id': @promotion.id,
+              'customer-email': 'billy@blogs.com'
             }
+          }
         }
 
         post '/api/v1/generate', params: params, headers: authorization_header
