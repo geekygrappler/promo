@@ -19,24 +19,16 @@ class Promotion < ApplicationRecord
   end
 
   # @return Promocode
-  def generate_promocode(customer_email = nil)
-    promocode = Promocode.new(code: ('a'..'z').to_a.shuffle[0,8].join)
-    if self.constraints
-      if self.constraints.include?('SpecificCustomer') &&
-        customer_email.nil?
-        return SpecificCustomerConstraintError.new
-      end
-      if self.constraints.include?('UniqueCustomerGeneration') &&
-        Promocode.find_by_customer_email(customer_email)
-        return UniqueCustomerGenerationError.new
-      end
-      if self.constraints.include?('SinglePromocode') &&
-        !self.promocodes.empty?
-        return SinglePromocodeError.new
-      end
+  def generate_promocode(submitted_promocode)
+    promocode = Promocode.new(
+      code: ('a'..'z').to_a.shuffle[0,8].join,
+      customer_email: submitted_promocode[:'customer-email'],
+      promotion_id: self.id
+    )
+    error = promocode.satisfies_constraints?(submitted_promocode)
+    if error.is_a?(ConstraintError)
+      return error
     end
-    promocode.customer_email = customer_email
-    promocode.promotion = self
     return promocode
   end
 

@@ -91,7 +91,12 @@ describe 'generate endpoint', type: :request do
             once per customer' do
         @promotion.add_constraint 'UniqueCustomerGeneration'
         @promotion.save
-        @promotion.generate_promocode('billy@blogs.com').save
+        @promotion.generate_promocode(
+          {
+            'customer-email': 'billy@blogs.com',
+            'promotion-id': @promotion.id
+          }
+        ).save
 
         params = {
           data: {
@@ -115,7 +120,12 @@ describe 'generate endpoint', type: :request do
       it 'should respond with an error if the promotion already has a promocode' do
         @promotion.add_constraint 'SinglePromocode'
         @promotion.save
-        @promotion.generate_promocode.save
+        @promotion.generate_promocode(
+          {
+            'customer-email': 'billy@blogs.com',
+            'promotion-id': @promotion.id
+          }
+        ).save
 
         params = {
           data: {

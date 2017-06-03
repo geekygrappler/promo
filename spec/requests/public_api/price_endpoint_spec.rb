@@ -12,21 +12,23 @@ describe 'price endpoint', type: :request do
     }
   }
   describe 'SpecificCustomer promotions' do
-    it 'should return a price when the correct customer email is passed' do
-      promotion = Promotion.create(
+    before(:each) do
+      @promotion = Promotion.create(
         name: promotion_name,
         start_date: start_date,
         user: user
       )
 
-      promotion.add_constraint 'SpecificCustomer'
+      @promotion.add_constraint 'SpecificCustomer'
+      @promotion.save
 
       Promocode.create(
         code: 'xyz123',
         customer_email: 'hodder@winterfell.com',
-        promotion_id: promotion.id
+        promotion_id: @promotion.id
       )
-
+    end
+    it 'should return a price when the correct customer email is passed' do
       params = {
         data: {
           type: 'promocodes',
@@ -53,11 +55,51 @@ describe 'price endpoint', type: :request do
       expect(json_api_attributes['delivery-total'].to_i).to eq(7)
     end
 
-    xit 'should return an error when the wrong customer email is passed' do
+    it 'should return an error when the wrong customer email is passed' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: 'xyz123',
+            'customer-email': 'theon@pyke.com'
+          }
+        },
+        included: {
+          type: 'carts',
+          attributes: {
+            'total': 39
+          }
+        }
+      }
 
+      get '/api/v1/price', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to match('This promocode doens\'t belong to this customer')
     end
 
-    xit 'should return an error when no customer email is passed' do
+    it 'should return an error when no customer email is passed' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: 'xyz123'
+          }
+        },
+        included: {
+          type: 'carts',
+          attributes: {
+            'total': 39
+          }
+        }
+      }
+
+      get '/api/v1/price', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to match('This promotion requires a customer email address')
 
     end
   end

@@ -9,7 +9,7 @@ class Api::V1::PromocodesController < ApplicationController
   # Generate a promocode for a Multiple Promotion
   def generate
     @promotion = Promotion.find(promocode_params['promotion-id'])
-    @promocode = @promotion.generate_promocode(promocode_params['customer-email'])
+    @promocode = @promotion.generate_promocode(promocode_params)
 
     # Pretty horrible
     if @promocode.is_a?(ConstraintError)
@@ -31,8 +31,21 @@ class Api::V1::PromocodesController < ApplicationController
   # GET '/api/v#/price'
   # Price a cart based on a promotion that owns the passed in promocode
   def price
+    @promotion = @promocode.promotion
+
     if @promocode
-      render json: price_response, status: :ok
+      error = @promocode.satisfies_constraints?(promocode_params)
+      if error.is_a?(ConstraintError)
+        render json: {
+          errors: [
+            {
+              title: error.message
+            }
+          ]
+        }, status: :unprocessable_entity
+      else
+        render json: price_response, status: :ok
+      end
     end
   end
 
