@@ -13,7 +13,7 @@ describe 'price endpoint', type: :request do
   }
   describe 'SpecificCustomer promotions' do
     it 'should return a price when the correct customer email is passed' do
-      promotion = Single.create(
+      promotion = Promotion.create(
         name: promotion_name,
         start_date: start_date,
         user: user

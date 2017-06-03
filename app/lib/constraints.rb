@@ -35,4 +35,10 @@ module Constraints
       @message = 'This customer already has a promocode for this promotion, and it\'s limited to one per customer'
     end
   end
+
+  class SinglePromocodeError < ConstraintError
+    def initialize
+      @message = 'This promotion is limited to one promocode and already has one'
+    end
+  end
 end
