@@ -11,19 +11,23 @@ describe 'Price endpoint:', type: :request do
       'Authorization': api_key.access_token
     }
   }
+  let(:code) {'xyz123'}
+
+  before(:each) do
+    @promotion = Promotion.create(
+      name: promotion_name,
+      start_date: start_date,
+      user: user
+    )
+  end
+
   describe 'SpecificCustomer promotions' do
     before(:each) do
-      @promotion = Promotion.create(
-        name: promotion_name,
-        start_date: start_date,
-        user: user
-      )
-
       @promotion.add_constraint 'SpecificCustomer'
       @promotion.save
 
       Promocode.create(
-        code: 'xyz123',
+        code: code,
         customer_email: 'hodder@winterfell.com',
         promotion_id: @promotion.id
       )
@@ -60,7 +64,7 @@ describe 'Price endpoint:', type: :request do
         data: {
           type: 'promocodes',
           attributes: {
-            code: 'xyz123',
+            code: code,
             'customer-email': 'theon@pyke.com'
           }
         },
@@ -84,7 +88,7 @@ describe 'Price endpoint:', type: :request do
         data: {
           type: 'promocodes',
           attributes: {
-            code: 'xyz123'
+            code: code
           }
         },
         included: {
@@ -103,5 +107,67 @@ describe 'Price endpoint:', type: :request do
 
     end
   end
-  describe ''
+
+  describe 'Promotion period constraints on promotions' do
+    before(:each) do
+      Promocode.create(
+        code: code,
+        promotion_id: @promotion.id
+      )
+    end
+    it 'should prevent a promocode being used after the promotion has ended' do
+      @promotion.start_date = (DateTime.now - 20).utc.iso8601
+      @promotion.end_date = (DateTime.now - 2).utc.iso8601
+      @promotion.save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code
+          }
+        },
+        included: {
+          type: 'carts',
+          attributes: {
+            'item-total': 27,
+            'delivery-total': 7
+          }
+        }
+      }
+
+      get '/api/v1/price', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to eq('This promotion has ended')
+    end
+
+    it 'should prevent a promocode being used before it has started' do
+      @promotion.start_date = (DateTime.now + 1).utc.iso8601
+      @promotion.save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code
+          }
+        },
+        included: {
+          type: 'carts',
+          attributes: {
+            'item-total': 27,
+            'delivery-total': 7
+          }
+        }
+      }
+
+      get '/api/v1/price', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to eq("This promotion has not started, it starts on #{@promotion.start_date.to_s}")
+    end
+  end
 end

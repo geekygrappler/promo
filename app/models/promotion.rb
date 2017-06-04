@@ -10,6 +10,10 @@ class Promotion < ApplicationRecord
   # Add a constraint to list of constraints
   def add_constraint(constraint)
     constraints = self.constraints
+
+    # Already constrained in this way, silently move on.
+    return if !constraints.nil? && constraints.include?(constraint)
+
     if constraints.nil?
       new_constraints = constraint
     else

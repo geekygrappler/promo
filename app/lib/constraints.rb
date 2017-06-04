@@ -54,6 +54,18 @@ module Constraints
     end
   end
 
+  class PromotionPeriodConstraint < Constraint
+    def validate(promocode, submitted_promocode = nil)
+      promotion = promocode.promotion
+      if promotion.end_date && promotion.end_date < Time.now
+        return PromotionPeriodError.new('This promotion has ended')
+      end
+      if promotion.start_date > Time.now
+        return PromotionPeriodError.new("This promotion has not started, it starts on #{promotion.start_date.to_s}")
+      end
+    end
+  end
+
   class ConstraintError
     attr_reader :message
     def initialize(message)
@@ -68,5 +80,8 @@ module Constraints
   end
 
   class SinglePromocodeError < ConstraintError
+  end
+
+  class PromotionPeriodError < ConstraintError
   end
 end

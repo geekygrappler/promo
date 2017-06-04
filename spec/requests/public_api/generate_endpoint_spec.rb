@@ -22,7 +22,7 @@ describe 'Generate endpoint:', type: :request do
     )
   end
 
-  describe 'Generating a promocode' do
+  describe 'a promotion' do
     it 'should generate a new promocode' do
       params = {
         data: {
@@ -44,103 +44,147 @@ describe 'Generate endpoint:', type: :request do
       expect(json['data']['id'].to_i).to eq(promocode.id)
       expect(json['data']['attributes']['code']).to eq(promocode.code)
     end
+  end
 
-    describe 'for a promotion with the SpecificCustomer constraint' do
-      before(:each) do
-        @promotion.add_constraint 'SpecificCustomer'
-        @promotion.save
-      end
-      it 'should generate a new promocode with a customer email' do
-        params = {
-          data: {
-            type: 'promocodes',
-            attributes: {
-              'promotion-id': @promotion.id,
-              'customer-email': customer_email
-            }
-          }
-        }
-
-        post '/api/v1/generate', params: params, headers: authorization_header
-
-        expect(response).to have_http_status(201)
-
-        promocode = Promocode.first
-        expect(json['data']['attributes']['customer-email']).to eq(promocode.customer_email)
-      end
-      it 'should respond with an error if no customer email is provided' do
-        params = {
-          data: {
-            type: 'promocodes',
-            attributes: {
-              'promotion-id': @promotion.id
-            }
-          }
-        }
-
-        post '/api/v1/generate', params: params, headers: authorization_header
-
-        expect(response).to have_http_status(422)
-
-        expect(json['errors'][0]['title']).to eq('This promotion requires a customer email address')
-      end
+  describe 'SpecificCustomer promotions' do
+    before(:each) do
+      @promotion.add_constraint 'SpecificCustomer'
+      @promotion.save
     end
-    describe 'for UniqueCustomerGeneration constraint' do
-      it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
-            once per customer' do
-        @promotion.add_constraint 'UniqueCustomerGeneration'
-        @promotion.save
-        @promotion.generate_promocode(
-          {
-            'customer-email': 'billy@blogs.com',
+    it 'should generate a new promocode when given a customer email' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            'promotion-id': @promotion.id,
+            'customer-email': customer_email
+          }
+        }
+      }
+
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(201)
+
+      promocode = Promocode.first
+      expect(json['data']['attributes']['customer-email']).to eq(promocode.customer_email)
+    end
+    it 'should respond with an error if no customer email is provided' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
             'promotion-id': @promotion.id
           }
-        ).save
+        }
+      }
 
-        params = {
-          data: {
-            type: 'promocodes',
-            attributes: {
-              'promotion-id': @promotion.id,
-              'customer-email': 'billy@blogs.com'
-            }
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to eq('This promotion requires a customer email address')
+    end
+  end
+
+  describe 'UniqueCustomerGeneration promotions' do
+    it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
+          once promocode per customer' do
+      @promotion.add_constraint 'UniqueCustomerGeneration'
+      @promotion.save
+      @promotion.generate_promocode(
+        {
+          'customer-email': 'billy@blogs.com',
+          'promotion-id': @promotion.id
+        }
+      ).save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            'promotion-id': @promotion.id,
+            'customer-email': 'billy@blogs.com'
           }
         }
+      }
 
-        post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/generate', params: params, headers: authorization_header
 
-        expect(response).to have_http_status(422)
+      expect(response).to have_http_status(422)
 
-        expect(json['errors'][0]['title']).to eq('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
-      end
+      expect(json['errors'][0]['title']).to eq('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
     end
+  end
 
-    describe 'for SinglePromocode constraint' do
-      it 'should respond with an error if the promotion already has a promocode' do
-        @promotion.add_constraint 'SinglePromocode'
-        @promotion.save
-        @promotion.generate_promocode(
-          {
-            'customer-email': 'billy@blogs.com',
+  describe 'SinglePromocode promotion' do
+    it 'should respond with an error if the promotion already has a promocode' do
+      @promotion.add_constraint 'SinglePromocode'
+      @promotion.save
+      @promotion.generate_promocode(
+        {
+          'customer-email': 'billy@blogs.com',
+          'promotion-id': @promotion.id
+        }
+      ).save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            'promotion-id': @promotion.id,
+          }
+        }
+      }
+
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to eq('This promotion is limited to one promocode and already has one')
+    end
+  end
+
+  describe 'Promotion period constraints on promotion' do
+    it 'should prevent a promocode being used after the promotion has ended' do
+      @promotion.start_date = (DateTime.now - 20).utc.iso8601
+      @promotion.end_date = (DateTime.now - 2).utc.iso8601
+      @promotion.save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
             'promotion-id': @promotion.id
           }
-        ).save
+        }
+      }
 
-        params = {
-          data: {
-            type: 'promocodes',
-            attributes: {
-              'promotion-id': @promotion.id,
-            }
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title']).to eq('This promotion has ended')
+    end
+
+    it 'should prevent a promocode being used before it has started' do
+      @promotion.start_date = (DateTime.now + 1).utc.iso8601
+      @promotion.save
+
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            'promotion-id': @promotion.id
           }
         }
+      }
 
-        post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/generate', params: params, headers: authorization_header
 
-        expect(response).to have_http_status(422)
+      expect(response).to have_http_status(422)
 
-        expect(json['errors'][0]['title']).to eq('This promotion is limited to one promocode and already has one')
-      end
+      expect(json['errors'][0]['title']).to eq("This promotion has not started, it starts on #{@promotion.start_date.to_s}")
     end
   end
 end
