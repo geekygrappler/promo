@@ -18,16 +18,16 @@ class Promotion < ApplicationRecord
     self.constraints = new_constraints
   end
 
-  # @return Promocode
+  # @return [Promocode || Array<ConstraintError>] Unsaved promocode record
   def generate_promocode(submitted_promocode)
     promocode = Promocode.new(
       code: ('a'..'z').to_a.shuffle[0,8].join,
       customer_email: submitted_promocode[:'customer-email'],
       promotion_id: self.id
     )
-    error = promocode.satisfies_constraints?(submitted_promocode)
-    if error.is_a?(ConstraintError)
-      return error
+    errors = promocode.constraint_errors(submitted_promocode)
+    if errors.any?
+      return errors
     end
     return promocode
   end

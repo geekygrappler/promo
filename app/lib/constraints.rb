@@ -13,9 +13,9 @@ module Constraints
 
     def validate(promocode, submitted_promocode)
       # If we have a saved promocode and emails match - bit shit, dealing with nils
-      if promocode.id && promocode.customer_email === submitted_promocode['customer-email']
-        return true
-      end
+      # if promocode.id && promocode.customer_email === submitted_promocode['customer-email']
+      #   return true
+      # end
 
       # This check must appear before the check against submitted vs saved email
       if submitted_promocode['customer-email'].nil?
@@ -25,7 +25,6 @@ module Constraints
       if promocode.customer_email != submitted_promocode['customer-email']
         return SpecificCustomerConstraintError.new('This promocode doens\'t belong to this customer')
       end
-      return true
     end
   end
 

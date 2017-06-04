@@ -11,11 +11,13 @@ class Api::V1::PromocodesController < ApplicationController
     @promotion = Promotion.find(promocode_params['promotion-id'])
     @promocode = @promotion.generate_promocode(promocode_params)
 
-    # Pretty horrible
-    if @promocode.is_a?(ConstraintError)
+    # Pretty horrible - generate_promocode returns either a Promocode or an Array of errors
+    if !@promocode.is_a?(Promocode)
         render json: {
-            errors: {
-                title: @promocode.message
+            errors: @promocode.map { |error|
+              {
+                title: error.message
+              }
             }
         }, status: :unprocessable_entity
     else
@@ -25,7 +27,6 @@ class Api::V1::PromocodesController < ApplicationController
         render json: @promocode.errors, status: :bad_request
       end
     end
-
   end
 
   # GET '/api/v#/price'
@@ -34,14 +35,14 @@ class Api::V1::PromocodesController < ApplicationController
     @promotion = @promocode.promotion
 
     if @promocode
-      error = @promocode.satisfies_constraints?(promocode_params)
-      if error.is_a?(ConstraintError)
+      errors = @promocode.constraint_errors(promocode_params)
+      if errors.any?
         render json: {
-          errors: [
+          errors: errors.map { |error|
             {
               title: error.message
             }
-          ]
+          }
         }, status: :unprocessable_entity
       else
         render json: price_response, status: :ok

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'generate endpoint', type: :request do
+describe 'Generate endpoint:', type: :request do
   let(:promotion_name) {'Test'}
   let(:start_date) {DateTime.now.utc.iso8601}
   let(:end_date) {(DateTime.now + 60).utc.iso8601}
@@ -22,7 +22,7 @@ describe 'generate endpoint', type: :request do
     )
   end
 
-  describe 'generating a promocode' do
+  describe 'Generating a promocode' do
     it 'should generate a new promocode' do
       params = {
         data: {
@@ -45,7 +45,7 @@ describe 'generate endpoint', type: :request do
       expect(json['data']['attributes']['code']).to eq(promocode.code)
     end
 
-    describe 'for SpecificCustomer constraint' do
+    describe 'for a promotion with the SpecificCustomer constraint' do
       before(:each) do
         @promotion.add_constraint 'SpecificCustomer'
         @promotion.save
@@ -68,7 +68,6 @@ describe 'generate endpoint', type: :request do
         promocode = Promocode.first
         expect(json['data']['attributes']['customer-email']).to eq(promocode.customer_email)
       end
-
       it 'should respond with an error if no customer email is provided' do
         params = {
           data: {
@@ -83,7 +82,7 @@ describe 'generate endpoint', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors']['title']).to eq('This promotion requires a customer email address')
+        expect(json['errors'][0]['title']).to eq('This promotion requires a customer email address')
       end
     end
     describe 'for UniqueCustomerGeneration constraint' do
@@ -112,7 +111,7 @@ describe 'generate endpoint', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors']['title']).to eq('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
+        expect(json['errors'][0]['title']).to eq('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
       end
     end
 
@@ -140,7 +139,7 @@ describe 'generate endpoint', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors']['title']).to eq('This promotion is limited to one promocode and already has one')
+        expect(json['errors'][0]['title']).to eq('This promotion is limited to one promocode and already has one')
       end
     end
   end
