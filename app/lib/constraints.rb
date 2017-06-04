@@ -1,3 +1,12 @@
+# List of Constraints and their intended purpose
+#
+# SinglePromocodeConstraint: Promotion can only have 1 promocode associated with it.
+#
+# UniqueCustomerGenerationConstraint: A Customer can only have 1 promocode associated to the Promotion
+#
+# SpecificCustomerConstraint: Can only be used by the Customer who owns it.
+
+
 module Constraints
   # Abstract class for a constraint
   class Constraint

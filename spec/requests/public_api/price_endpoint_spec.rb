@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'price endpoint', type: :request do
+describe 'Price endpoint:', type: :request do
   let(:promotion_name) {'Test'}
   let(:start_date) {DateTime.now.utc.iso8601}
   let(:end_date) {(DateTime.now + 60).utc.iso8601}
@@ -103,4 +103,5 @@ describe 'price endpoint', type: :request do
 
     end
   end
+  describe ''
 end

@@ -73,7 +73,6 @@ This is a nice to have in the future but not core.
 ## API
 
 - Endpoints
-- Promotions
 - Constraints
 - Modifiers
 - Models
@@ -147,29 +146,16 @@ even less clear after reading models. :)
 
 3 endpoints. Simples.
 
-### Promotions
-
-There are two types of Promotion
-
-**Single promocode:** One promocode usually picked by marketing manager e.g. 'Summer2017'
-
-**Multiple promocode:** Multiple promocodes, usually generated via the api e.g. 'xy382euu' generated on newsletter signup.
-
-*N.B Multiple Promocodes do not necessarily need to be tied to a customers email.*
-
-How to write the code to do this and how to message to Users?
-
 ### Constraints
 
 What is a constraint?
 A pre-condition that must be met in order to apply a promotion.
 
-They can live in different places. (not sure about this, maybe they should
-live in one place and be applied without caring, I think I'm coupling)
+Constraints live on the promotion.
 
-On the promocode
+**Single Promocode:** The Promotion can only have 1 promocode associated to it.
 
-On the promotion
+The default is for a promocode to be able to have many promocodes associated to it.
 
 **Specific Customer (Promocode):** Must match the email of the customer who owns the promocode. 
 (usually paired with Multiple promocode promotions, but don't want to constrain it to that, be flexible)
