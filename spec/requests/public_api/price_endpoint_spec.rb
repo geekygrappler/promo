@@ -20,6 +20,12 @@ describe 'Price endpoint:', type: :request do
       start_date: start_date,
       user: user
     )
+
+    Promocode.create(
+      code: code,
+      customer_email: 'hodder@winterfell.com',
+      promotion_id: @promotion.id
+    )
   end
 
   describe 'Constraints:' do
@@ -27,19 +33,13 @@ describe 'Price endpoint:', type: :request do
       before(:each) do
         @promotion.add_constraint SpecificCustomerConstraint.new
         @promotion.save
-
-        Promocode.create(
-          code: code,
-          customer_email: 'hodder@winterfell.com',
-          promotion_id: @promotion.id
-        )
       end
       it 'should return a price when the correct customer email is passed' do
         params = {
           data: {
             type: 'promocodes',
             attributes: {
-              code: 'xyz123',
+              code: code,
               'customer-email': 'hodder@winterfell.com'
             }
           },
@@ -111,12 +111,6 @@ describe 'Price endpoint:', type: :request do
     end
 
     describe 'Promotion period constraints on promotions' do
-      before(:each) do
-        Promocode.create(
-          code: code,
-          promotion_id: @promotion.id
-        )
-      end
       it 'should prevent a promocode being used after the promotion has ended' do
         @promotion.start_date = (DateTime.now - 20).utc.iso8601
         @promotion.end_date = (DateTime.now - 2).utc.iso8601
@@ -175,11 +169,57 @@ describe 'Price endpoint:', type: :request do
 
     describe 'MinimumBasketTotal promotions' do
       before(:each) do
-        @promotion.add_constraint('MinimumBasketTotal')
+        @promotion.add_constraint(MinimumBasketTotalConstraint.new(67))
         @promotion.save
       end
       it 'should price a cart that equals or exceeds the minimum basket total' do
-        
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              'item-total': 60,
+              'delivery-total': 7
+            }
+          }
+        }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(200)
+
+        expect(json_api_attributes['total'].to_i).to eq(67)
+        expect(json_api_attributes['item-total'].to_i).to eq(60)
+        expect(json_api_attributes['delivery-total'].to_i).to eq(7)
+      end
+
+      it 'should not price a cart that is less than the minimum basket total' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              'item-total': 60,
+              'delivery-total': 6
+            }
+          }
+        }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(422)
+
+        expect(json['errors'][0]['title']).to eq('This promotion requires a minimum basket total of £67, the current basket is only £66')
       end
     end
   end

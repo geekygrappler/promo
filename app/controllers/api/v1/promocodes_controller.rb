@@ -35,7 +35,7 @@ class Api::V1::PromocodesController < ApplicationController
     @promotion = @promocode.promotion
 
     if @promocode
-      errors = @promocode.constraint_errors(promocode_params)
+      errors = @promocode.constraint_errors(promocode_params, cart_params)
       if errors.any?
         render json: {
           errors: errors.map { |error|
