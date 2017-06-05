@@ -1,4 +1,5 @@
 require 'rails_helper'
+include Constraints
 
 describe 'Generate endpoint:', type: :request do
   let(:promotion_name) {'Test'}
@@ -48,7 +49,7 @@ describe 'Generate endpoint:', type: :request do
 
   describe 'SpecificCustomer promotions' do
     before(:each) do
-      @promotion.add_constraint 'SpecificCustomer'
+      @promotion.add_constraint SpecificCustomerConstraint.new
       @promotion.save
     end
     it 'should generate a new promocode when given a customer email' do
@@ -90,7 +91,7 @@ describe 'Generate endpoint:', type: :request do
   describe 'UniqueCustomerGeneration promotions' do
     it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
           once promocode per customer' do
-      @promotion.add_constraint 'UniqueCustomerGeneration'
+      @promotion.add_constraint UniqueCustomerGenerationConstraint.new
       @promotion.save
       @promotion.generate_promocode(
         {
@@ -119,7 +120,7 @@ describe 'Generate endpoint:', type: :request do
 
   describe 'SinglePromocode promotion' do
     it 'should respond with an error if the promotion already has a promocode' do
-      @promotion.add_constraint 'SinglePromocode'
+      @promotion.add_constraint SinglePromocodeConstraint.new
       @promotion.save
       @promotion.generate_promocode(
         {

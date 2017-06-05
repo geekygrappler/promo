@@ -1,4 +1,5 @@
 require 'rails_helper'
+include Constraints
 
 describe 'Price endpoint:', type: :request do
   let(:promotion_name) {'Test'}
@@ -23,7 +24,7 @@ describe 'Price endpoint:', type: :request do
 
   describe 'SpecificCustomer promotions' do
     before(:each) do
-      @promotion.add_constraint 'SpecificCustomer'
+      @promotion.add_constraint SpecificCustomerConstraint.new
       @promotion.save
 
       Promocode.create(

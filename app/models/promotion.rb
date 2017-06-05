@@ -2,24 +2,19 @@ class Promotion < ApplicationRecord
   include Constraints
   belongs_to :user
   has_many :promocodes
+  serialize :constraints, Array
 
   validates :start_date, presence: true
 
   before_validation :set_blank_start_date
+  before_save :add_promotion_period_constraint
 
-  # Add a constraint to list of constraints
+  # Add a constraint to the promotion. It will update the constraint if it already exists.
+  # @param [Constraint] constraint class
+  # @return void
   def add_constraint(constraint)
-    constraints = self.constraints
-
-    # Already constrained in this way, silently move on.
-    return if !constraints.nil? && constraints.include?(constraint)
-
-    if constraints.nil?
-      new_constraints = constraint
-    else
-      new_constraints = constraints + ',' + constraint
-    end
-    self.constraints = new_constraints
+    self.constraints.delete_if { |saved_constraint| saved_constraint.class == constraint.class }
+    self.constraints.push(constraint)
   end
 
   # @return [Promocode || Array<ConstraintError>] Unsaved promocode record
@@ -44,5 +39,9 @@ class Promotion < ApplicationRecord
       # Should set to TZ of the person making the request.
       self.start_date = Time.now.utc
     end
+  end
+
+  def add_promotion_period_constraint
+    self.constraints.push(PromotionPeriodConstraint.new)
   end
 end

@@ -15,7 +15,7 @@ module Constraints
     end
   end
 
-  class SpecificCustomerConstraint
+  class SpecificCustomerConstraint < Constraint
     # Don't know how this will work yet.
     # Should be called where we have access to @promocode.
     # and can pass in a customer email from the request.
@@ -63,6 +63,13 @@ module Constraints
       if promotion.start_date > Time.now
         return PromotionPeriodError.new("This promotion has not started, it starts on #{promotion.start_date.to_s}")
       end
+    end
+  end
+
+  class MinimumBasketTotalConstraint < Constraint
+    attr_reader :total
+    def initialize(total)
+      @total = total
     end
   end
 
