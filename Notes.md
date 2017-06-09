@@ -198,6 +198,8 @@ Could have Delivery, Item, and total, but lets stick to total price with flexibi
 This is just a special case of Percentage Delivery Discount (100%) and in the code we should
 just have the 6 above and on the front end a 'free delivery' constraint which is actually just 100% delivery discount.
 
+TODO there might need to be some kind of application order logic, like A preceeds B but don't need that just yet.
+
 ### Models
 
 This is what Marketing managers see and can create on the web client.

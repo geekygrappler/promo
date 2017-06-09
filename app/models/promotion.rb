@@ -1,8 +1,11 @@
 class Promotion < ApplicationRecord
   include Constraints
+  include Modifiers
+
   belongs_to :user
   has_many :promocodes
   serialize :constraints, Array
+  serialize :modifiers, Array
 
   validates :start_date, presence: true
 
@@ -13,8 +16,18 @@ class Promotion < ApplicationRecord
   # @param [Constraint] constraint class
   # @return void
   def add_constraint(constraint)
+    # if constraint < Constraints::Constraint
+    #   raise(NameError)
+    # end
     self.constraints.delete_if { |saved_constraint| saved_constraint.class == constraint.class }
     self.constraints.push(constraint)
+  end
+
+  # Add a modifier to the promotion. It will update the modifier if it already exists.
+  # @param [Modifier] modifier class
+  def add_modifier(modifier)
+    self.modifiers.delete_if { |saved_modifier| saved_modifier.class == saved_modifier.class}
+    self.modifiers.push(modifier)
   end
 
   # @return [Promocode || Array<ConstraintError>] Unsaved promocode record
@@ -41,6 +54,7 @@ class Promotion < ApplicationRecord
     end
   end
 
+  # All promotions have period constraint.
   def add_promotion_period_constraint
     self.constraints.push(PromotionPeriodConstraint.new)
   end

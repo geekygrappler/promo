@@ -9,9 +9,10 @@
 
 module Constraints
   # Abstract class for a constraint
+  # Code smell I don't think I should have an abstract class. Passing in 3 variables also smells.
   class Constraint
     def validate(promocode, submitted_promocode = nil, cart = nil)
-      return true
+      true
     end
   end
 

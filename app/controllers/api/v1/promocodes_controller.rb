@@ -34,6 +34,12 @@ class Api::V1::PromocodesController < ApplicationController
   def price
     @promotion = @promocode.promotion
 
+    # begin
+    #    get_price
+    # resue e (should be an array of errors)
+    #    render json: errors
+    #
+
     if @promocode
       errors = @promocode.constraint_errors(promocode_params, @cart)
       if errors.any?
@@ -69,6 +75,11 @@ class Api::V1::PromocodesController < ApplicationController
   end
 
   def price_response
+    # map over all the modifiers, each one will give you a cart or an error (or do we reduce?!)
+
+    # Raise if there are any errors
+
+
     attributes = Hash.new
     cart_params['item-total'] ? attributes.store('item-total', cart_params['item-total']) : nil
     cart_params['delivery-total'] ? attributes.store('delivery-total', cart_params['delivery-total']) : nil

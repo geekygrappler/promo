@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Promocode, type: :model do
+describe Promotion, type: :model do
   let(:promotion) { Promotion.create(
     name: 'test',
     start_date: Time.now
@@ -15,6 +15,9 @@ describe Promocode, type: :model do
 
   describe 'adding a constraint' do
     let(:constraint) { instance_double('SpecificCustomerConstraint') }
+    before(:each) do
+      allow(constraint).to receive(:<).and_return(true)
+    end
     it 'should add a constraint' do
       promotion.add_constraint(constraint)
 
@@ -22,7 +25,7 @@ describe Promocode, type: :model do
       expect(promotion.constraints.first).to equal(constraint)
     end
 
-    # TODO figure out how to do this in ruby.
+    # TODO figure out how to do this in ruby. Raise is the key word here. Getting closer.
     # it 'should raise an error if not passed a constraint' do
     #   allow(constraint).to receive(:<).and_return(true)
     #   expect{ promotion.add_constraint('foo') }.to raise_error(NameError)
@@ -35,8 +38,25 @@ describe Promocode, type: :model do
 
       expect(promotion.constraints.count).to equal(1)
       expect(promotion.constraints.first).to equal(new_constraint)
-      expect(promotion.constraints.first).not_to equal(constraint)
+    end
+  end
 
+  describe 'adding a modifier' do
+    let(:modifier) { instance_double('AbsoluteTotalModifier')}
+    it 'should add a modifier' do
+      promotion.add_modifier(modifier)
+
+      expect(promotion.modifiers.count).to eq(1)
+      expect(promotion.modifiers.first).to eq(modifier)
+    end
+
+    it 'should replace an exisiting modifier with the new modifier' do
+      promotion.add_modifier(modifier)
+      new_modifier = instance_double('AbsoluteTotalModifier')
+      promotion.add_modifier(new_modifier)
+
+      expect(promotion.modifiers.count).to eq(1)
+      expect(promotion.modifiers.first).to eq(new_modifier)
     end
   end
 end

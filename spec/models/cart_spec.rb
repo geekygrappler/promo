@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-#TODO test string -> decimal conversion & 
 describe Cart, type: :model do
   describe 'initialisation' do
     describe 'cart total' do
