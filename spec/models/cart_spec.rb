@@ -11,7 +11,7 @@ describe Cart, type: :model do
           'total': '21'
         })
 
-        expect(cart.total).to eq(21)
+        expect(cart.total).to eq(Monetize.parse(21))
       end
       it 'should calculate a cart total from item total and delivery total' do
         cart = Cart.new({
@@ -19,14 +19,14 @@ describe Cart, type: :model do
          'delivery-total': '7'
         })
 
-        expect(cart.total).to eq(20)
+        expect(cart.total).to eq(Monetize.parse(20))
       end
       it 'should handle decimals correctly in the total' do
         cart = Cart.new({
           'total': '13.99'
         })
 
-        expect(cart.total).to eq(13.99)
+        expect(cart.total).to eq(Monetize.parse(13.99))
       end
     end
   end

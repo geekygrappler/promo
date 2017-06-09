@@ -64,12 +64,12 @@ module Constraints
   class MinimumBasketTotalConstraint < Constraint
     attr_reader :total
     def initialize(total)
-      @total = total
+      @total = Monetize.parse(total)
     end
 
     def validate(promocode, submitted_promocode, cart)
       if (cart.total) < @total
-        return MinimumBasketTotalConstraintError.new("This promotion requires a minimum basket total of £#{@total}, the current basket is only £#{cart.total}")
+        return MinimumBasketTotalConstraintError.new("This promotion requires a minimum basket total of #{@total.format}, the current basket is only #{cart.total.format}")
       end
     end
   end

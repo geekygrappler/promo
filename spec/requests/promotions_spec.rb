@@ -75,32 +75,4 @@ RSpec.describe 'Promotions API', type: :request do
       expect(Time.parse(json['data']['attributes']['start-date']).to_s).to eq(Time.now.utc.to_s)
     end
   end
-
-  xdescribe'creating a "Single" promotion' do
-
-    let(:default_single_params) {
-      default_params[:data][:attributes][:promotion_type] = 'single'
-      return default_params
-    }
-
-    it 'should create a Single promotion' do
-      post '/api/v1/promotions', params: default_single_params, headers: authorization_header
-
-      expect(response).to have_http_status(201)
-
-      expect(json['data']['attributes']['promotion-type']).to eq('Single')
-    end
-
-    it 'should require a user defined promocode string' do
-      byebug
-      post '/api/v1/promotions', params: default_single_params, headers: authorization_header
-
-      # TODO change to 422
-      expect(response).to have_http_status(401)
-
-      expect(json['errors']['title']).to eq('Single Promotoins require a promocode string')
-    end
-  end
-
-  describe 'creating a "Multiple Promotion"'
 end
