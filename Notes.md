@@ -200,6 +200,9 @@ just have the 6 above and on the front end a 'free delivery' constraint which is
 
 TODO there might need to be some kind of application order logic, like A preceeds B but don't need that just yet.
 
+N.B. Total precludes the possibility of having an item or delivery price modifier, but you can have item and
+delivery modifiers on the same Promotion.
+
 ### Models
 
 This is what Marketing managers see and can create on the web client.

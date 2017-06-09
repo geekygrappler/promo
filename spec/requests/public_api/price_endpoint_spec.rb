@@ -223,4 +223,59 @@ describe 'Price endpoint:', type: :request do
       end
     end
   end
+
+  describe 'Modifiers:' do
+    describe 'PercentageItemsModifier AND PercentageDeliveryModifier' do
+      before(:each) do
+        @promotion.add_modifier(PercentageItemsModifier.new(10))
+        @promotion.add_modifier(PercentageDeliveryModifier.new(100))
+      end
+
+      it 'should return a correctly discounted cart' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              'item-total': 100,
+              'delivery-total': 13
+            }
+          }
+        }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(200)
+
+        expect(json_api_attributes['total'].to_i).to eq(90)
+        expect(json_api_attributes['item-total'].to_i).to eq(90)
+        expect(json_api_attributes['delivery-total'].to_i).to eq(0)
+      end
+
+      it 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              'total': 113
+            }
+          }
+        }
+
+        expect(json['errors'][0]['title']).to match('This promocode requires an item total to be passed in the request')
+        expect(json['errors'][1]['title']).to match('This promocode requires a deliver total to be passed in the request')
+      end
+    end
+  end
 end
