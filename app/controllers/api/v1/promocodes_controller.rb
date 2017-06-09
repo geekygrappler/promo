@@ -3,7 +3,7 @@ class Api::V1::PromocodesController < ApplicationController
   include Constraints
 
   before_action :set_user_from_access_token, only: [:generate, :price]
-  before_action :set_promocode, only: [:price]
+  before_action :set_promocode, :set_cart, only: [:price]
 
   # POST '/api/v#/generate'
   # Generate a promocode for a Multiple Promotion
@@ -35,7 +35,7 @@ class Api::V1::PromocodesController < ApplicationController
     @promotion = @promocode.promotion
 
     if @promocode
-      errors = @promocode.constraint_errors(promocode_params, cart_params)
+      errors = @promocode.constraint_errors(promocode_params, @cart)
       if errors.any?
         render json: {
           errors: errors.map { |error|
@@ -52,6 +52,7 @@ class Api::V1::PromocodesController < ApplicationController
 
   private
   def promocode_params
+    # TODO obviously promotion is a relationship and should be dealt with in a JSON:API way.
     params.require(:data).require(:attributes).permit('promotion-id', 'customer-email', 'code')
   end
 
@@ -61,6 +62,10 @@ class Api::V1::PromocodesController < ApplicationController
 
   def set_promocode
     @promocode = Promocode.find_by_code(promocode_params['code'])
+  end
+
+  def set_cart
+    @cart = Cart.new(cart_params)
   end
 
   def price_response

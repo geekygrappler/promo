@@ -10,7 +10,7 @@
 module Constraints
   # Abstract class for a constraint
   class Constraint
-    def validate(promocode, submitted_promocode = nil, submitted_cart = nil)
+    def validate(promocode, submitted_promocode = nil, cart = nil)
       return true
     end
   end
@@ -33,7 +33,7 @@ module Constraints
   end
 
   class SinglePromocodeConstraint < Constraint
-    def validate(promocode, submitted_promocode, submitted_cart = nil)
+    def validate(promocode, submitted_promocode, cart = nil)
       promotion = promocode.promotion
       if !promotion.promocodes.empty?
         return SinglePromocodeError.new('This promotion is limited to one promocode and already has one')
@@ -42,7 +42,7 @@ module Constraints
   end
 
   class UniqueCustomerGenerationConstraint < Constraint
-    def validate(promocode, submitted_promocode, submitted_cart = nil)
+    def validate(promocode, submitted_promocode, cart = nil)
       if Promocode.find_by_customer_email(submitted_promocode['customer-email'])
         return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
       end
@@ -50,7 +50,7 @@ module Constraints
   end
 
   class PromotionPeriodConstraint < Constraint
-    def validate(promocode, submitted_promocode = nil, submitted_cart = nil)
+    def validate(promocode, submitted_promocode = nil, cart = nil)
       promotion = promocode.promotion
       if promotion.end_date && promotion.end_date < Time.now
         return PromotionPeriodError.new('This promotion has ended')
@@ -67,10 +67,9 @@ module Constraints
       @total = total
     end
 
-    def validate(promocode, submitted_promocode, submitted_cart)
-      total = submitted_cart['item-total'].to_i + submitted_cart['delivery-total'].to_i
-      if (total) < @total
-        return MinimumBasketTotalConstraintError.new("This promotion requires a minimum basket total of £#{@total}, the current basket is only £#{total}")
+    def validate(promocode, submitted_promocode, cart)
+      if (cart.total) < @total
+        return MinimumBasketTotalConstraintError.new("This promotion requires a minimum basket total of £#{@total}, the current basket is only £#{cart.total}")
       end
     end
   end
