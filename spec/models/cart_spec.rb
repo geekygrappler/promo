@@ -21,13 +21,6 @@ describe Cart, type: :model do
 
         expect(cart.total).to eq(Monetize.parse(20))
       end
-      it 'should handle decimals correctly in the total' do
-        cart = Cart.new({
-          'total': '13.99'
-        })
-
-        expect(cart.total).to eq(Monetize.parse(13.99))
-      end
     end
   end
 end
