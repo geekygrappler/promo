@@ -26,7 +26,7 @@ class Promotion < ApplicationRecord
   # Add a modifier to the promotion. It will update the modifier if it already exists.
   # @param [Modifier] modifier class
   def add_modifier(modifier)
-    self.modifiers.delete_if { |saved_modifier| saved_modifier.class == saved_modifier.class}
+    self.modifiers.delete_if { |saved_modifier| saved_modifier.class == modifier.class}
     self.modifiers.push(modifier)
   end
 

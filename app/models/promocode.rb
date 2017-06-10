@@ -15,13 +15,21 @@ class Promocode < ApplicationRecord
     }.select{ |error| !error.nil? } # This is code smell shouldn't have to filter for nil (Null Object Pattern)
   end
 
-  # Returns a new cart that has been modified
+  # Returns a *new* cart that has been modified, we must not mess with passed in cart.
   #
   # @param [Cart] cart the submitted cart
-  # @raise [ModifierException] Reason a cart can't be modified
+  # @raise [Array<ModifierException>] Reason a cart can't be modified
   # @return [Cart] A new cart that has had it's prices modified according to the promotions modifiers
-  def modified_cart(cart)
-    return nil
+  def price_cart(cart)
+    # errors = self.promotion.modifiers.map { |modifier|
+    #   modifier.apply(cart)
+    # }
+
+    new_cart = cart.dup
+    self.promotion.modifiers.reduce(new_cart) { |cart, modifier|
+      modifier.apply(cart)
+    }
+
   end
   private
 end

@@ -40,6 +40,7 @@ class Api::V1::PromocodesController < ApplicationController
     #    render json: errors
     #
 
+    priced_cart = @promocode.price_cart(@cart)
     if @promocode
       errors = @promocode.constraint_errors(promocode_params, @cart)
       if errors.any?
@@ -88,6 +89,10 @@ class Api::V1::PromocodesController < ApplicationController
       data: {
         type: 'prices',
         attributes: attributes
+      },
+      included: {
+        type: 'carts',
+        attributes: cart_params
       }
     }
   end

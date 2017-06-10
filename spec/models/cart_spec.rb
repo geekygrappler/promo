@@ -22,4 +22,30 @@ describe Cart, type: :model do
       end
     end
   end
+
+  describe 'updates' do
+    it 'should update the item total and recalculate the total' do
+      cart = Cart.new({
+        'item-total': '13',
+        'delivery-total': '7'
+      })
+
+      cart.update_attr('item_total', 3)
+
+      expect(cart.item_total).to eq(Monetize.parse(3))
+      expect(cart.total).to eq(Monetize.parse(10))
+    end
+
+    it 'should update the delivery total and recalculate the total' do
+      cart = Cart.new({
+        'item-total': '13',
+        'delivery-total': '7'
+      })
+
+      cart.update_attr('delivery_total', 3)
+
+      expect(cart.delivery_total).to eq(Monetize.parse(3))
+      expect(cart.total).to eq(Monetize.parse(16))
+    end
+  end
 end

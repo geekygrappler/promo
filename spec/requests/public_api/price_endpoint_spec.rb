@@ -1,5 +1,6 @@
 require 'rails_helper'
 include Constraints
+include Modifiers
 
 describe 'Price endpoint:', type: :request do
   let(:promotion_name) {'Test'}
@@ -252,9 +253,16 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(200)
 
-        expect(json_api_attributes['total'].to_i).to eq(90)
-        expect(json_api_attributes['item-total'].to_i).to eq(90)
-        expect(json_api_attributes['delivery-total'].to_i).to eq(0)
+        expect(json['data']['type']).to eq('prices')
+        expect(json_api_attributes['item-original-total'].to_i).to eq(100)
+        expect(json_api_attributes['item-discounted-total'].to_i).to to eq(90)
+        expect(json_api_attributes['item-discount'].to_i).to eq(10)
+        expect(json_api_attributes['delivery-original-total'].to_i).to eq(13)
+        expect(json_api_attributes['delivery-discounted-total'].to_i).to eq(0)
+        expect(json_api_attributes['delivery-discount'].to_i).to eq(13)
+        expect(json_api_attributes['original-total'].to_i).to eq(113)
+        expect(json_api_attributes['discounted-total'].to_i).to eq(90)
+        expect(json_api_attributes['total-discount'].to_i).to eq(23)
       end
 
       it 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
