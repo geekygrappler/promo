@@ -11,6 +11,7 @@ module Modifiers
 
   class PercentageModifier < Modifier
     def initialize(percentage)
+      # TODO do floats work? Check. Make sure we don't get decimal BUGS
       @percentage = percentage.to_f/100.to_f
     end
   end
@@ -24,15 +25,14 @@ module Modifiers
   class PercentageItemsModifier < PercentageModifier
 
     def apply(cart)
-      binding.pry
-      cart.item_total = cart.item_total * (1 - @percentage)
+      cart.update_attr('item_total', cart.item_total * (1 - @percentage))
       cart
     end
   end
 
   class PercentageDeliveryModifier < PercentageModifier
     def apply(cart)
-      cart.delivery_total =  cart.delivery_total * (1 - @percentage)
+      cart.update_attr('delivery_total', cart.delivery_total * (1 - @percentage))
       cart
     end
   end

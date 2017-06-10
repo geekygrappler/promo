@@ -1,6 +1,8 @@
+#TODO once we have a client dealing with CRUD Promocode actions, it will be clear that Public API endpoints do not belong here!
+
 class Api::V1::PromocodesController < ApplicationController
   include Authorisation
-  include Constraints
+  include Pricing
 
   before_action :set_user_from_access_token, only: [:generate, :price]
   before_action :set_promocode, :set_cart, only: [:price]
@@ -36,11 +38,10 @@ class Api::V1::PromocodesController < ApplicationController
 
     # begin
     #    get_price
-    # resue e (should be an array of errors)
+    # rescue e (should be an array of errors)
     #    render json: errors
-    #
-
-    priced_cart = @promocode.price_cart(@cart)
+    # end
+    @discounted_cart = @promocode.price_cart(@cart)
     if @promocode
       errors = @promocode.constraint_errors(promocode_params, @cart)
       if errors.any?
@@ -76,23 +77,15 @@ class Api::V1::PromocodesController < ApplicationController
   end
 
   def price_response
-    # map over all the modifiers, each one will give you a cart or an error (or do we reduce?!)
+    response_attrs = price_difference(@cart, @discounted_cart)
+    binding.pry
+    # TODO include our original cart and our new cart for debugging purposes (in dev maybe)
 
-    # Raise if there are any errors
-
-
-    attributes = Hash.new
-    cart_params['item-total'] ? attributes.store('item-total', cart_params['item-total']) : nil
-    cart_params['delivery-total'] ? attributes.store('delivery-total', cart_params['delivery-total']) : nil
-    cart_total ? attributes.store('total', cart_total) : nil
-    return price_response = {
+    #TODO serialize to JSON::API
+    price_response = {
       data: {
         type: 'prices',
-        attributes: attributes
-      },
-      included: {
-        type: 'carts',
-        attributes: cart_params
+        attributes: response_attrs
       }
     }
   end

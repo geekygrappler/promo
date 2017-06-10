@@ -226,10 +226,50 @@ describe 'Price endpoint:', type: :request do
   end
 
   describe 'Modifiers:' do
+    describe 'PercentaeItemsModifier' do
+      before(:each) do
+        @promotion.add_modifier(PercentageItemsModifier.new(20))
+        @promotion.save
+      end
+      it 'should return a correctly discounted cart' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              'item-total': 100,
+              'delivery-total': 13
+            }
+          }
+        }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(200)
+
+        expect(json['data']['type']).to eq('prices')
+        expect(json_api_attributes['original-item-total'].to_i).to eq(100)
+        expect(json_api_attributes['discounted-item-total'].to_i).to to eq(80)
+        expect(json_api_attributes['item-discount'].to_i).to eq(20)
+        expect(json_api_attributes['original-delivery-total'].to_i).to eq(13)
+        expect(json_api_attributes['discounted-delivery-total'].to_i).to eq(13)
+        expect(json_api_attributes['delivery-discount'].to_i).to eq(0)
+        expect(json_api_attributes['original-total'].to_i).to eq(113)
+        expect(json_api_attributes['discounted-total'].to_i).to eq(93)
+        expect(json_api_attributes['total-discount'].to_i).to eq(20)
+      end
+    end
+
     describe 'PercentageItemsModifier AND PercentageDeliveryModifier' do
       before(:each) do
         @promotion.add_modifier(PercentageItemsModifier.new(10))
         @promotion.add_modifier(PercentageDeliveryModifier.new(100))
+        @promotion.save
       end
 
       it 'should return a correctly discounted cart' do
@@ -254,18 +294,18 @@ describe 'Price endpoint:', type: :request do
         expect(response).to have_http_status(200)
 
         expect(json['data']['type']).to eq('prices')
-        expect(json_api_attributes['item-original-total'].to_i).to eq(100)
-        expect(json_api_attributes['item-discounted-total'].to_i).to to eq(90)
+        expect(json_api_attributes['original-item-total'].to_i).to eq(100)
+        expect(json_api_attributes['discounted-item-total'].to_i).to to eq(90)
         expect(json_api_attributes['item-discount'].to_i).to eq(10)
-        expect(json_api_attributes['delivery-original-total'].to_i).to eq(13)
-        expect(json_api_attributes['delivery-discounted-total'].to_i).to eq(0)
+        expect(json_api_attributes['original-delivery-total'].to_i).to eq(13)
+        expect(json_api_attributes['discounted-delivery-total'].to_i).to eq(0)
         expect(json_api_attributes['delivery-discount'].to_i).to eq(13)
         expect(json_api_attributes['original-total'].to_i).to eq(113)
         expect(json_api_attributes['discounted-total'].to_i).to eq(90)
         expect(json_api_attributes['total-discount'].to_i).to eq(23)
       end
 
-      it 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
+      xit 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
         params = {
           data: {
             type: 'promocodes',

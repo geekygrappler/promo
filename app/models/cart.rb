@@ -3,6 +3,7 @@
 # I'm allowing people to mess around with cart values through the Public API. It's not immutable. Maybe this
 # will cause problems in the future.
 class Cart
+  # TODO remove money from here. We don't care about Money, just Numbers that are to two decimal places. We can return 7.00
   attr_accessor :item_total, :delivery_total
   attr_reader :total
   # @param [Hash] cart hash of a customers cart passed by user via the api

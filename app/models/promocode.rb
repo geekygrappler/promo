@@ -24,7 +24,6 @@ class Promocode < ApplicationRecord
     # errors = self.promotion.modifiers.map { |modifier|
     #   modifier.apply(cart)
     # }
-
     new_cart = cart.dup
     self.promotion.modifiers.reduce(new_cart) { |cart, modifier|
       modifier.apply(cart)
