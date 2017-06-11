@@ -57,9 +57,9 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(200)
 
-        expect(json_api_attributes['total'].to_i).to eq(34)
-        expect(json_api_attributes['item-total'].to_i).to eq(27)
-        expect(json_api_attributes['delivery-total'].to_i).to eq(7)
+        expect(json_api_attributes['discounted-total']).to eq("34.0")
+        expect(json_api_attributes['discounted-item-total']).to eq("27.0")
+        expect(json_api_attributes['discounted-delivery-total']).to eq("7.0")
       end
 
       it 'should return an error when the wrong customer email is passed' do
@@ -194,9 +194,9 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(200)
 
-        expect(json_api_attributes['total'].to_i).to eq(67)
-        expect(json_api_attributes['item-total'].to_i).to eq(60)
-        expect(json_api_attributes['delivery-total'].to_i).to eq(7)
+        expect(json_api_attributes['discounted-total']).to eq('67.0')
+        expect(json_api_attributes['discounted-item-total']).to eq('60.0')
+        expect(json_api_attributes['discounted-delivery-total']).to eq('7.0')
       end
 
       it 'should not price a cart that is less than the minimum basket total' do
@@ -253,15 +253,15 @@ describe 'Price endpoint:', type: :request do
         expect(response).to have_http_status(200)
 
         expect(json['data']['type']).to eq('prices')
-        expect(json_api_attributes['original-item-total'].to_i).to eq(100)
-        expect(json_api_attributes['discounted-item-total'].to_i).to to eq(80)
-        expect(json_api_attributes['item-discount'].to_i).to eq(20)
-        expect(json_api_attributes['original-delivery-total'].to_i).to eq(13)
-        expect(json_api_attributes['discounted-delivery-total'].to_i).to eq(13)
-        expect(json_api_attributes['delivery-discount'].to_i).to eq(0)
-        expect(json_api_attributes['original-total'].to_i).to eq(113)
-        expect(json_api_attributes['discounted-total'].to_i).to eq(93)
-        expect(json_api_attributes['total-discount'].to_i).to eq(20)
+        expect(json_api_attributes['original-item-total']).to eq('100.0')
+        expect(json_api_attributes['discounted-item-total']).to eq('80.0')
+        expect(json_api_attributes['item-discount']).to eq('20.0')
+        expect(json_api_attributes['original-delivery-total']).to eq('13.0')
+        expect(json_api_attributes['discounted-delivery-total']).to eq('13.0')
+        expect(json_api_attributes['delivery-discount']).to eq('0.0')
+        expect(json_api_attributes['original-total']).to eq('113.0')
+        expect(json_api_attributes['discounted-total']).to eq('93.0')
+        expect(json_api_attributes['total-discount']).to eq('20.0')
       end
     end
 
@@ -294,15 +294,15 @@ describe 'Price endpoint:', type: :request do
         expect(response).to have_http_status(200)
 
         expect(json['data']['type']).to eq('prices')
-        expect(json_api_attributes['original-item-total'].to_i).to eq(100)
-        expect(json_api_attributes['discounted-item-total'].to_i).to to eq(90)
-        expect(json_api_attributes['item-discount'].to_i).to eq(10)
-        expect(json_api_attributes['original-delivery-total'].to_i).to eq(13)
-        expect(json_api_attributes['discounted-delivery-total'].to_i).to eq(0)
-        expect(json_api_attributes['delivery-discount'].to_i).to eq(13)
-        expect(json_api_attributes['original-total'].to_i).to eq(113)
-        expect(json_api_attributes['discounted-total'].to_i).to eq(90)
-        expect(json_api_attributes['total-discount'].to_i).to eq(23)
+        expect(json_api_attributes['original-item-total']).to eq('100.0')
+        expect(json_api_attributes['discounted-item-total']).to eq('90.0')
+        expect(json_api_attributes['item-discount']).to eq('10.0')
+        expect(json_api_attributes['original-delivery-total']).to eq('13.0')
+        expect(json_api_attributes['discounted-delivery-total']).to eq('0.0')
+        expect(json_api_attributes['delivery-discount']).to eq('13.0')
+        expect(json_api_attributes['original-total']).to eq('113.0')
+        expect(json_api_attributes['discounted-total']).to eq('90.0')
+        expect(json_api_attributes['total-discount']).to eq('23.0')
       end
 
       xit 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do

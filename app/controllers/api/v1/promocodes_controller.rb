@@ -3,6 +3,7 @@
 class Api::V1::PromocodesController < ApplicationController
   include Authorisation
   include Pricing
+  include JsonApi
 
   before_action :set_user_from_access_token, only: [:generate, :price]
   before_action :set_promocode, :set_cart, only: [:price]
@@ -78,14 +79,12 @@ class Api::V1::PromocodesController < ApplicationController
 
   def price_response
     response_attrs = price_difference(@cart, @discounted_cart)
-    binding.pry
-    # TODO include our original cart and our new cart for debugging purposes (in dev maybe)
 
-    #TODO serialize to JSON::API
+    # TODO include our original cart and our new cart for debugging purposes (in dev maybe)
     price_response = {
       data: {
         type: 'prices',
-        attributes: response_attrs
+        attributes: hyphenate(response_attrs)
       }
     }
   end
