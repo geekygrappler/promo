@@ -3,25 +3,31 @@
 # I'm allowing people to mess around with cart values through the Public API. It's not immutable. Maybe this
 # will cause problems in the future.
 class Cart
-  # TODO remove money from here. We don't care about Money, just Numbers that are to two decimal places. We can return 7.00
   attr_accessor :item_total, :delivery_total
   attr_reader :total
-  # @param [Hash] cart hash of a customers cart passed by user via the api
+
+
+  # @param [Hash] cart hash of a customers cart
+  # @return [Cart]
   def initialize(cart)
-    @delivery_total = cart[:'delivery-total'] ? Monetize.parse(cart[:'delivery-total']) : nil
-    @item_total = cart[:'item-total'] ? Monetize.parse(cart[:'item-total']) : nil
-    @total = cart[:'total'] ? Monetize.parse(cart[:'total']) : calculate_cart_total
+    if !(cart[:delivery_total] || cart[:'delivery-total']).nil?
+      @delivery_total = (cart[:delivery_total] || cart[:'delivery-total']).to_d
+    end
+    if !(cart[:item_total] || cart[:'item-total']).nil?
+      @item_total = (cart[:item_total] || cart[:'item-total']).to_d
+    end
+    @total = calculate_cart_total
   end
 
   # Updates a carts attributes and ensures total also gets updated to reflect new values
   # TODO protect against anything other than delivery_total and item_total being submitted here.
   #
   # @param [String] attr_name name of the attribute to be updated
-  # @param [Integer] value new value of the attribute
+  # @param [String | BigDecimal | Integer] value new value of the attribute
   # @return [Cart]
   def update_attr(attr_name, value)
     attr_name = create_instance_variable_symbol(attr_name)
-    self.instance_variable_set(attr_name, Monetize.parse(value))
+    self.instance_variable_set(attr_name, value.to_d)
     self.instance_variable_set(:@total, calculate_cart_total)
     self
   end
@@ -32,6 +38,6 @@ class Cart
   end
 
   def calculate_cart_total
-    @delivery_total + @item_total
+    (@delivery_total || 0) + (@item_total || 0)
   end
 end

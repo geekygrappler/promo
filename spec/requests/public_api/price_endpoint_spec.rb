@@ -220,7 +220,7 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors'][0]['title']).to eq('This promotion requires a minimum basket total of £67, the current basket is only £66')
+        expect(json['errors'][0]['title']).to eq('This promotion requires a minimum basket total of 67.0, the current basket is only 66.0')
       end
     end
   end

@@ -11,8 +11,7 @@ module Modifiers
 
   class PercentageModifier < Modifier
     def initialize(percentage)
-      # TODO do floats work? Check. Make sure we don't get decimal BUGS
-      @percentage = percentage.to_f/100.to_f
+      @percentage = percentage.to_d/100.to_d
     end
   end
 
