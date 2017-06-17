@@ -41,14 +41,14 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code,
-              'customer-email': 'hodder@winterfell.com'
+              customer_email: 'hodder@winterfell.com'
             }
           },
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 27,
-              'delivery-total': 7
+              item_total: 27,
+              delivery_total: 7
             }
           }
         }
@@ -57,9 +57,9 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(200)
 
-        expect(json_api_attributes['discounted-total']).to eq("34.0")
-        expect(json_api_attributes['discounted-item-total']).to eq("27.0")
-        expect(json_api_attributes['discounted-delivery-total']).to eq("7.0")
+        expect(json_api_attributes['discounted-total']).to eq('34.0')
+        expect(json_api_attributes['discounted-item-total']).to eq('27.0')
+        expect(json_api_attributes['discounted-delivery-total']).to eq('7.0')
       end
 
       it 'should return an error when the wrong customer email is passed' do
@@ -68,13 +68,14 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code,
-              'customer-email': 'theon@pyke.com'
+              customer_email: 'theon@pyke.com'
             }
           },
           included: {
             type: 'carts',
             attributes: {
-              'total': 39
+              item_total: 99,
+              delivery_total: 9
             }
           }
         }
@@ -83,7 +84,7 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors'][0]['title']).to match('This promocode doens\'t belong to this customer')
+        expect(json['errors'][0]['title']).to match('This promocode doesn\'t belong to this customer')
       end
 
       it 'should return an error when no customer email is passed' do
@@ -106,7 +107,7 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(422)
 
-        expect(json['errors'][0]['title']).to match('This promotion requires a customer email address')
+        expect(json['errors'][0]['title']).to match('This promotion requires a customer email, please supply one')
 
       end
     end
@@ -127,8 +128,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 27,
-              'delivery-total': 7
+              item_total: 27,
+              delivery_total: 7
             }
           }
         }
@@ -154,8 +155,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 27,
-              'delivery-total': 7
+              item_total: 27,
+              delivery_total: 7
             }
           }
         }
@@ -184,8 +185,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 60,
-              'delivery-total': 7
+              item_total: 60,
+              delivery_total: 7
             }
           }
         }
@@ -210,8 +211,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 60,
-              'delivery-total': 6
+              item_total: 60,
+              delivery_total: 6
             }
           }
         }

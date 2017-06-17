@@ -222,6 +222,7 @@ describe 'Generate endpoint:', type: :request do
       expect(json['errors'][0]['title']).to eq('This promotion has ended')
     end
 
+    # TODO this is wrong. We should allow promocodes to be generated before the promotion starts
     it 'should prevent a promocode being generate before it has started' do
       @promotion.start_date = (DateTime.now + 1).utc.iso8601
       @promotion.save

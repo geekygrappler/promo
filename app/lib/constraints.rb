@@ -21,17 +21,19 @@ module Constraints
   # this means a customer email must be provided at time of generation, and that specific promocode can
   # only be redeemed by that customer.
   class SpecificCustomerConstraint < Constraint
-    # Don't know how this will work yet.
-    # Should be called where we have access to @promocode.
-    # and can pass in a customer email from the request.
-
     def validate(promocode, submitted_promocode, submitted_cart = nil)
-      # Can't be valid if user has not submitted a promocode with a customer email
-      if submitted_promocode.nil? || submitted_promocode && submitted_promocode[:customer_email].nil?
+
+      # This is the case when we are generating a promocode but not supplying a customer email (dev error)
+      if submitted_promocode.nil?
         return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
       end
 
-      # Is not valid if the submitted promocode customer email does not equal the saved promocode customer email
+      # This is the case when we are pricing a promocode but not supplying a customer email (dev error)
+      if submitted_promocode && submitted_promocode[:customer_email].nil?
+        return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
+      end
+
+      # Is not valid if the submitted promocode customer email does not equal the saved promocode customer email (customer error)
       if promocode.customer_email != submitted_promocode[:customer_email]
         return SpecificCustomerConstraintError.new('This promocode doesn\'t belong to this customer')
       end
