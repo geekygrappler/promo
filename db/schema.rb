@@ -12,9 +12,12 @@
 
 ActiveRecord::Schema.define(version: 20170609204205) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "api_keys", force: :cascade do |t|
     t.string "access_token"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_api_keys_on_user_id"
@@ -23,7 +26,7 @@ ActiveRecord::Schema.define(version: 20170609204205) do
   create_table "promocodes", force: :cascade do |t|
     t.string "code"
     t.string "customer_email"
-    t.integer "promotion_id"
+    t.bigint "promotion_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["promotion_id"], name: "index_promocodes_on_promotion_id"
@@ -35,7 +38,7 @@ ActiveRecord::Schema.define(version: 20170609204205) do
     t.datetime "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "constraints"
     t.string "modifiers"
     t.index ["user_id"], name: "index_promotions_on_user_id"
@@ -47,4 +50,6 @@ ActiveRecord::Schema.define(version: 20170609204205) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "api_keys", "users"
+  add_foreign_key "promotions", "users"
 end
