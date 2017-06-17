@@ -16,19 +16,24 @@ module Constraints
     end
   end
 
+  # What is a Specific Customer Constraint?
+  # It means any customer is entitled to the promotion, but a promocode must be linked to customer email
+  # this means a customer email must be provided at time of generation, and that specific promocode can
+  # only be redeemed by that customer.
   class SpecificCustomerConstraint < Constraint
     # Don't know how this will work yet.
     # Should be called where we have access to @promocode.
     # and can pass in a customer email from the request.
 
     def validate(promocode, submitted_promocode, submitted_cart = nil)
-      # This check must appear before the check against submitted vs saved email
-      if submitted_promocode['customer-email'].nil?
-        return SpecificCustomerConstraintError.new('This promotion requires a customer email address')
+      # Can't be valid if user has not submitted a promocode with a customer email
+      if submitted_promocode.nil? || submitted_promocode && submitted_promocode[:customer_email].nil?
+        return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
       end
-      
-      if promocode.customer_email != submitted_promocode['customer-email']
-        return SpecificCustomerConstraintError.new('This promocode doens\'t belong to this customer')
+
+      # Is not valid if the submitted promocode customer email does not equal the saved promocode customer email
+      if promocode.customer_email != submitted_promocode[:customer_email]
+        return SpecificCustomerConstraintError.new('This promocode doesn\'t belong to this customer')
       end
     end
   end
@@ -42,14 +47,18 @@ module Constraints
     end
   end
 
+  # What is a Unique Customer Constraint?
+  # It means any customer is entitled to the promotion, but a promocode will be linked to a customer email
+  # and they can only have one promocode.
   class UniqueCustomerGenerationConstraint < Constraint
     def validate(promocode, submitted_promocode, cart = nil)
-      if Promocode.find_by_customer_email(submitted_promocode['customer-email'])
+      if Promocode.find_by_customer_email(submitted_promocode[:customer_email])
         return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
       end
     end
   end
 
+  #TODO can we generate a Promocode before the promotion actually starts?
   class PromotionPeriodConstraint < Constraint
     def validate(promocode, submitted_promocode = nil, cart = nil)
       promotion = promocode.promotion

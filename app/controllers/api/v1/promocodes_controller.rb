@@ -11,25 +11,44 @@ class Api::V1::PromocodesController < ApplicationController
   # POST '/api/v#/generate'
   # Generate a promocode for a Multiple Promotion
   def generate
-    @promotion = Promotion.find(promocode_params['promotion-id'])
-    @promocode = @promotion.generate_promocode(promocode_params)
+    # @promotion = Promotion.find(promocode_params['promotion-id'])
+    # @promocode = @promotion.generate_promocode(promocode_params)
+    @promocode = Promocode.new(promocode_attributes)
+    @promocode.promotion = Promotion.find(promotion_params[:id])
 
-    # Pretty horrible - generate_promocode returns either a Promocode or an Array of errors
-    if !@promocode.is_a?(Promocode)
-        render json: {
-            errors: @promocode.map { |error|
-              {
-                title: error.message
-              }
-            }
-        }, status: :unprocessable_entity
-    else
+    validator = PromocodeValidator.new
+
+    validator.validate(@promocode, promocode_attributes)
+
+    if validator.valid?
+      if promocode_attributes && promocode_attributes[:code].nil?
+        @promocode.code = @promocode.generate_code
+      end
       if @promocode.save
         render json: @promocode, status: :created
       else
-        render json: @promocode.errors, status: :bad_request
+        render json: @promocode.errors, status: :unprocessable_entity
       end
+    else
+      render json: json_api_error_response(validator.errors), status: :unprocessable_entity
     end
+
+    # # Pretty horrible - generate_promocode returns either a Promocode or an Array of errors
+    # if !@promocode.is_a?(Promocode)
+    #     render json: {
+    #         errors: @promocode.map { |error|
+    #           {
+    #             title: error.message
+    #           }
+    #         }
+    #     }, status: :unprocessable_entity
+    # else
+    #   if @promocode.save
+    #     render json: @promocode, status: :created
+    #   else
+    #     render json: @promocode.errors, status: :bad_request
+    #   end
+    # end
   end
 
   # GET '/api/v#/price'
@@ -61,16 +80,23 @@ class Api::V1::PromocodesController < ApplicationController
 
   private
   def promocode_params
-    # TODO obviously promotion is a relationship and should be dealt with in a JSON:API way.
-    params.require(:data).require(:attributes).permit('promotion-id', 'customer-email', 'code')
+    params.require(:data).permit(attributes: [:customer_email, :code])
+  end
+
+  def promocode_attributes
+    promocode_params[:attributes]
   end
 
   def cart_params
-    params.require(:included).require(:attributes).permit('item-total', 'delivery-total', 'total')
+    params.require(:included).permit(attributes: [:item_total, :delivery_total, :total])
+  end
+
+  def promotion_params
+    params.require(:included).permit(:id)
   end
 
   def set_promocode
-    @promocode = Promocode.find_by_code(promocode_params['code'])
+    @promocode = Promocode.find_by_code(promocode_params[:code])
   end
 
   def set_cart
@@ -90,10 +116,10 @@ class Api::V1::PromocodesController < ApplicationController
   end
 
   def cart_total
-    if cart_params['total']
-      return cart_params['total']
+    if cart_params[:total]
+      return cart_params[:total]
     else
-      return cart_params['item-total'].to_i + cart_params['delivery-total'].to_i
+      return cart_params[:item_total].to_i + cart_params[:delivery_total].to_i
     end
   end
 end

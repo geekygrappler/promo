@@ -28,9 +28,10 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-          attributes: {
-            'promotion-id': @promotion.id
-          }
+        },
+        included: {
+          type: 'promotion',
+          id: @promotion.id
         }
       }
 
@@ -57,9 +58,12 @@ describe 'Generate endpoint:', type: :request do
         data: {
           type: 'promocodes',
           attributes: {
-            'promotion-id': @promotion.id,
-            'customer-email': customer_email
+            customer_email: customer_email
           }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 
@@ -68,15 +72,16 @@ describe 'Generate endpoint:', type: :request do
       expect(response).to have_http_status(201)
 
       promocode = Promocode.first
-      expect(json['data']['attributes']['customer-email']).to eq(promocode.customer_email)
+      expect(json_api_attributes['customer-email']).to eq(promocode.customer_email)
     end
     it 'should respond with an error if no customer email is provided' do
       params = {
         data: {
-          type: 'promocodes',
-          attributes: {
-            'promotion-id': @promotion.id
-          }
+          type: 'promocodes'
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 
@@ -84,29 +89,56 @@ describe 'Generate endpoint:', type: :request do
 
       expect(response).to have_http_status(422)
 
-      expect(json['errors'][0]['title']).to eq('This promotion requires a customer email address')
+      expect(json['errors'][0]['title']).to eq('This promotion requires a customer email, please supply one')
     end
   end
 
   describe 'UniqueCustomerGeneration promotions' do
-    it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
-          once promocode per customer' do
+    before(:each) do
       @promotion.add_constraint UniqueCustomerGenerationConstraint.new
       @promotion.save
-      @promotion.generate_promocode(
-        {
-          'customer-email': 'billy@blogs.com',
-          'promotion-id': @promotion.id
+    end
+    it 'should generate a promocode for a customer' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            customer_email: customer_email
+          }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
-      ).save
+      }
+
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(201)
+
+      promocode = Promocode.first
+      expect(json_api_attributes['customer-email']).to eq(promocode.customer_email)
+    end
+    it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
+          once promocode per customer' do
+      Promocode.create(
+        {
+          code: 'xyz123',
+          customer_email: 'billy@blogs.com',
+          promotion: @promotion
+        }
+      )
 
       params = {
         data: {
           type: 'promocodes',
           attributes: {
-            'promotion-id': @promotion.id,
-            'customer-email': 'billy@blogs.com'
+            customer_email: 'billy@blogs.com'
           }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 
@@ -119,22 +151,43 @@ describe 'Generate endpoint:', type: :request do
   end
 
   describe 'SinglePromocode promotion' do
-    it 'should respond with an error if the promotion already has a promocode' do
+    before(:each) do
       @promotion.add_constraint SinglePromocodeConstraint.new
       @promotion.save
-      @promotion.generate_promocode(
-        {
-          'customer-email': 'billy@blogs.com',
-          'promotion-id': @promotion.id
+    end
+    it 'should generate a promocode' do
+      params = {
+        data: {
+          type: 'promocodes'
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
-      ).save
+      }
+
+      post '/api/v1/generate', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(201)
+
+      expect(Promocode.all.count).to eq(1)
+      expect(json_api_attributes['code']).to eq(Promocode.first.code)
+    end
+    it 'should respond with an error if the promotion already has a promocode' do
+      Promocode.create(
+        {
+          code: 'xyz123',
+          promotion: @promotion
+        }
+      )
 
       params = {
         data: {
           type: 'promocodes',
-          attributes: {
-            'promotion-id': @promotion.id,
-          }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 
@@ -147,7 +200,7 @@ describe 'Generate endpoint:', type: :request do
   end
 
   describe 'Promotion period constraints on promotion' do
-    it 'should prevent a promocode being used after the promotion has ended' do
+    it 'should prevent a promocode being generated after the promotion has ended' do
       @promotion.start_date = (DateTime.now - 20).utc.iso8601
       @promotion.end_date = (DateTime.now - 2).utc.iso8601
       @promotion.save
@@ -155,9 +208,10 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-          attributes: {
-            'promotion-id': @promotion.id
-          }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 
@@ -168,16 +222,17 @@ describe 'Generate endpoint:', type: :request do
       expect(json['errors'][0]['title']).to eq('This promotion has ended')
     end
 
-    it 'should prevent a promocode being used before it has started' do
+    it 'should prevent a promocode being generate before it has started' do
       @promotion.start_date = (DateTime.now + 1).utc.iso8601
       @promotion.save
 
       params = {
         data: {
           type: 'promocodes',
-          attributes: {
-            'promotion-id': @promotion.id
-          }
+        },
+        included: {
+          type: 'promotions',
+          id: @promotion.id
         }
       }
 

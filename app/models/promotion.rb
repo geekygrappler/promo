@@ -9,6 +9,7 @@ class Promotion < ApplicationRecord
 
   validates :start_date, presence: true
 
+
   before_validation :set_blank_start_date
   before_save :add_promotion_period_constraint
 
@@ -30,20 +31,6 @@ class Promotion < ApplicationRecord
     self.modifiers.push(modifier)
   end
 
-  # @return [Promocode || Array<ConstraintError>] Unsaved promocode record
-  def generate_promocode(submitted_promocode)
-    promocode = Promocode.new(
-      code: ('a'..'z').to_a.shuffle[0,8].join,
-      customer_email: submitted_promocode[:'customer-email'],
-      promotion_id: self.id
-    )
-    errors = promocode.constraint_errors(submitted_promocode)
-    if errors.any?
-      return errors
-    end
-    return promocode
-  end
-
   private
 
   def set_blank_start_date
@@ -56,6 +43,6 @@ class Promotion < ApplicationRecord
 
   # All promotions have period constraint.
   def add_promotion_period_constraint
-    self.constraints.push(PromotionPeriodConstraint.new)
+    self.add_constraint(PromotionPeriodConstraint.new)
   end
 end

@@ -15,6 +15,10 @@ class Promocode < ApplicationRecord
     }.select{ |error| !error.nil? } # This is code smell shouldn't have to filter for nil (Null Object Pattern)
   end
 
+  def generate_code
+    ('a'..'z').to_a.shuffle[0,8].join
+  end
+
   # Returns a *new* cart that has been modified, we must not mess with passed in cart.
   #
   # @param [Cart] cart the submitted cart
