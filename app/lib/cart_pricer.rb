@@ -1,14 +1,20 @@
 class CartPricer
+  attr_reader :priced_cart
+
+  def initialize
+    @priced_cart = nil
+  end
+
   # Returns a *new* cart that has been modified, we must not mess with passed in cart.
   #
-  # Only call this on a valid promocode OR ELSE!!
+  # Only call this on a valid promocode (PromocodeValidator) and a valid cart (CartValidator) OR ELSE!!
   #
   # @param [Cart] cart the submitted cart
   # @param [Promocode] promocode the saved promocode
   # @return [Cart] A new cart that has had it's prices modified according to the promotion linked to the promcode's modifiers
   def price(cart, promocode)
     new_cart = cart.dup
-    promocode.promotion.modifiers.reduce(new_cart) { |cart, modifier|
+    @priced_cart = promocode.promotion.modifiers.reduce(new_cart) { |cart, modifier|
       modifier.apply(cart)
     }
   end

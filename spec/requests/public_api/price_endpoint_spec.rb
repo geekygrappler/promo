@@ -227,7 +227,7 @@ describe 'Price endpoint:', type: :request do
   end
 
   describe 'Modifiers:' do
-    describe 'PercentaeItemsModifier' do
+    describe 'PercentgeItemsModifier' do
       before(:each) do
         @promotion.add_modifier(PercentageItemsModifier.new(20))
         @promotion.save
@@ -243,8 +243,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 100,
-              'delivery-total': 13
+              item_total: 100,
+              delivery_total: 13
             }
           }
         }
@@ -263,6 +263,29 @@ describe 'Price endpoint:', type: :request do
         expect(json_api_attributes['original-total']).to eq('113.0')
         expect(json_api_attributes['discounted-total']).to eq('93.0')
         expect(json_api_attributes['total-discount']).to eq('20.0')
+      end
+
+      it 'should return an error if an item_total is not supplied' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code
+            }
+          },
+          included: {
+            type: 'carts',
+            attributes: {
+              delivery_total: 13
+            }
+          }
+        }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(422)
+
+        expect(json['errors'][0]['title']).to eq('This promocode requires an item total to be passed in the request')
       end
     end
 
@@ -284,8 +307,8 @@ describe 'Price endpoint:', type: :request do
           included: {
             type: 'carts',
             attributes: {
-              'item-total': 100,
-              'delivery-total': 13
+              item_total: 100,
+              delivery_total: 13
             }
           }
         }
@@ -306,7 +329,7 @@ describe 'Price endpoint:', type: :request do
         expect(json_api_attributes['total-discount']).to eq('23.0')
       end
 
-      xit 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
+      it 'should return two errors with explanations if item-total and delivery-total are not supplied in the request' do
         params = {
           data: {
             type: 'promocodes',
@@ -321,6 +344,10 @@ describe 'Price endpoint:', type: :request do
             }
           }
         }
+
+        get '/api/v1/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(422)
 
         expect(json['errors'][0]['title']).to match('This promocode requires an item total to be passed in the request')
         expect(json['errors'][1]['title']).to match('This promocode requires a deliver total to be passed in the request')

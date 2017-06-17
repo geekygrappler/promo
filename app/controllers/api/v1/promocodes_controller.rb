@@ -6,7 +6,7 @@ class Api::V1::PromocodesController < ApplicationController
 
   before_action :set_user_from_access_token, only: [:generate, :price]
   before_action :set_promocode, :set_cart, only: [:price]
-  before_action :set_validator, only:[:generate, :price]
+  before_action :set_promocode_validator, only:[:generate, :price]
 
   # POST '/api/v#/generate'
   # Generate a promocode for a Multiple Promotion
@@ -14,9 +14,9 @@ class Api::V1::PromocodesController < ApplicationController
     @promocode = Promocode.new(promocode_attributes)
     @promocode.promotion = Promotion.find(promotion_params[:id])
 
-    @validator.validate(@promocode, promocode_attributes)
+    @promocode_validator.validate(@promocode, promocode_attributes)
 
-    if @validator.valid?
+    if @promocode_validator.valid?
       if promocode_attributes && promocode_attributes[:code].nil?
         @promocode.code = @promocode.generate_code
       end
@@ -26,7 +26,7 @@ class Api::V1::PromocodesController < ApplicationController
         render json: @promocode.errors, status: :unprocessable_entity
       end
     else
-      render json: json_api_error_response(@validator.errors), status: :unprocessable_entity
+      render json: json_api_error_response(@promocode_validator.errors), status: :unprocessable_entity
     end
   end
 
@@ -34,14 +34,22 @@ class Api::V1::PromocodesController < ApplicationController
   # Price a cart based on a promotion that owns the passed in promocode
   def price
     # binding.pry
-    @validator.validate(@promocode, promocode_attributes, @cart)
+    @promocode_validator.validate(@promocode, promocode_attributes, @cart)
 
-    if !@validator.valid?
-      render json: json_api_error_response(@validator.errors), status: :unprocessable_entity and return
+    if !@promocode_validator.valid?
+      render json: json_api_error_response(@promocode_validator.errors), status: :unprocessable_entity and return
     end
 
-    if @validator.valid?
-      # TODO wrap in begin end. Should never have this failing as the promocode & cart are valid so throw a 500
+    @cart_validator = CartValidator.new
+
+    @cart_validator.validate(@promocode, @cart)
+
+    if !@cart_validator.valid?
+      render json: json_api_error_response(@cart_validator.errors), status: :unprocessable_entity and return
+    end
+
+    if @promocode_validator.valid? && @cart_validator.valid?
+      # TODO wrap in begin rescue. Should never have this failing as the promocode & cart are valid so throw a 500
       @cart_pricer = CartPricer.new
       @discounted_cart = @cart_pricer.price(@cart, @promocode)
       if @discounted_cart
@@ -88,8 +96,8 @@ class Api::V1::PromocodesController < ApplicationController
     @cart = Cart.new(cart_attributes)
   end
 
-  def set_validator
-    @validator = PromocodeValidator.new
+  def set_promocode_validator
+    @promocode_validator = PromocodeValidator.new
   end
 
   def price_response

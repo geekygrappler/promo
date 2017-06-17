@@ -3,9 +3,15 @@
 module Modifiers
   #TODO do these need precedence?
   class Modifier
-    # Take cart return a new cart or give an error
+
+    # @param [Cart] cart
+    # @return [Cart] the same cart with the modifier applied to it.
     def apply(cart)
       return cart
+    end
+
+    def validate(cart)
+      return true
     end
   end
 
@@ -22,10 +28,16 @@ module Modifiers
   end
 
   class PercentageItemsModifier < PercentageModifier
-
     def apply(cart)
+      # binding.pry
       cart.update_attr('item_total', cart.item_total * (1 - @percentage))
       cart
+    end
+
+    def validate(cart)
+      if cart.item_total.nil?
+        return PercentageItemsModifierError.new('This promocode requires an item total to be passed in the request')
+      end
     end
   end
 
@@ -34,5 +46,24 @@ module Modifiers
       cart.update_attr('delivery_total', cart.delivery_total * (1 - @percentage))
       cart
     end
+
+    def validate(cart)
+      if cart.delivery_total.nil?
+        return PercentageDeliveryModiferError.new('This promocode requires a deliver total to be passed in the request')
+      end
+    end
+  end
+
+  class ModifierError
+    attr_reader :message
+    def initialize(message)
+      @message = message
+    end
+  end
+
+  class PercentageItemsModifierError < ModifierError
+  end
+
+  class PercentageDeliveryModiferError < ModifierError
   end
 end
