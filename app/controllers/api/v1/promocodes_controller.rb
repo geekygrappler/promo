@@ -14,7 +14,7 @@ class Api::V1::PromocodesController < ApplicationController
     @promocode = Promocode.new(promocode_attributes)
     @promocode.promotion = Promotion.find(promotion_params[:id])
 
-    @promocode_validator.validate(@promocode, promocode_attributes)
+    @promocode_validator.validate_generation(@promocode, promocode_attributes)
 
     if @promocode_validator.valid?
       if promocode_attributes && promocode_attributes[:code].nil?
@@ -34,7 +34,7 @@ class Api::V1::PromocodesController < ApplicationController
   # Price a cart based on a promotion that owns the passed in promocode
   def price
     # binding.pry
-    @promocode_validator.validate(@promocode, promocode_attributes, @cart)
+    @promocode_validator.validate_pricing(@promocode, promocode_attributes, @cart)
 
     if !@promocode_validator.valid?
       render json: json_api_error_response(@promocode_validator.errors), status: :unprocessable_entity and return

@@ -9,9 +9,15 @@
 
 module Constraints
   # Abstract class for a constraint
-  # Code smell I don't think I should have an abstract class. Passing in 3 variables also smells.
+  # Code smell I don't think I should have an abstract class.
   class Constraint
-    def validate(promocode, submitted_promocode = nil, cart = nil)
+    # Check the submitted promocode is valid to be generated
+    def validate_generation(promocode, submitted_promocode = nil)
+      true
+    end
+
+    # Check the submitted promocode is valid for pricing
+    def validate_pricing(promocode, submitted_promocode = nil, cart = nil)
       true
     end
   end
@@ -21,13 +27,14 @@ module Constraints
   # this means a customer email must be provided at time of generation, and that specific promocode can
   # only be redeemed by that customer.
   class SpecificCustomerConstraint < Constraint
-    def validate(promocode, submitted_promocode, submitted_cart = nil)
-
+    def validate_generation(promocode, submitted_promocode)
       # This is the case when we are generating a promocode but not supplying a customer email (dev error)
       if submitted_promocode.nil?
         return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
       end
+    end
 
+    def validate_pricing(promocode, submitted_promocode = nil, cart = nil)
       # This is the case when we are pricing a promocode but not supplying a customer email (dev error)
       if submitted_promocode && submitted_promocode[:customer_email].nil?
         return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
@@ -41,7 +48,7 @@ module Constraints
   end
 
   class SinglePromocodeConstraint < Constraint
-    def validate(promocode, submitted_promocode, cart = nil)
+    def validate_generation(promocode, submitted_promocode = nil)
       promotion = promocode.promotion
       if !promotion.promocodes.empty?
         return SinglePromocodeError.new('This promotion is limited to one promocode and already has one')
@@ -49,20 +56,32 @@ module Constraints
     end
   end
 
-  # What is a Unique Customer Constraint?
+  # What is a One Per Customer Constraint?
   # It means any customer is entitled to the promotion, but a promocode will be linked to a customer email
   # and they can only have one promocode.
-  class UniqueCustomerGenerationConstraint < Constraint
-    def validate(promocode, submitted_promocode, cart = nil)
+  class OnePerCustomerConstraint < Constraint
+    def validate_generation(promocode, submitted_promocode = nil)
+      if Promocode.find_by_customer_email(submitted_promocode[:customer_email])
+        return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
+      end
+    end
+
+    def validate_pricing(promocode, submitted_promocode, cart = nil)
       if Promocode.find_by_customer_email(submitted_promocode[:customer_email])
         return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
       end
     end
   end
 
-  #TODO can we generate a Promocode before the promotion actually starts?
   class PromotionPeriodConstraint < Constraint
-    def validate(promocode, submitted_promocode = nil, cart = nil)
+    def validate_generation(promocode, submitted_promocode = nil)
+      promotion = promocode.promotion
+      if promotion.end_date && promotion.end_date < Time.now
+        return PromotionPeriodError.new('This promotion has ended')
+      end
+    end
+
+    def validate_pricing(promocode, submitted_promocode = nil, cart = nil)
       promotion = promocode.promotion
       if promotion.end_date && promotion.end_date < Time.now
         return PromotionPeriodError.new('This promotion has ended')
@@ -79,7 +98,7 @@ module Constraints
       @total = total.to_d
     end
 
-    def validate(promocode, submitted_promocode, cart)
+    def validate_pricing(promocode, submitted_promocode, cart)
       if (cart.total) < @total
         return MinimumBasketTotalConstraintError.new("This promotion requires a minimum basket total of #{@total}, the current basket is only #{cart.total}")
       end

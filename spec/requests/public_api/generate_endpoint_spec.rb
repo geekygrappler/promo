@@ -93,9 +93,9 @@ describe 'Generate endpoint:', type: :request do
     end
   end
 
-  describe 'UniqueCustomerGeneration promotions' do
+  describe 'OnePerCustomer promotions' do
     before(:each) do
-      @promotion.add_constraint UniqueCustomerGenerationConstraint.new
+      @promotion.add_constraint OnePerCustomerConstraint.new
       @promotion.save
     end
     it 'should generate a promocode for a customer' do
@@ -222,8 +222,7 @@ describe 'Generate endpoint:', type: :request do
       expect(json['errors'][0]['title']).to eq('This promotion has ended')
     end
 
-    # TODO this is wrong. We should allow promocodes to be generated before the promotion starts
-    it 'should prevent a promocode being generate before it has started' do
+    it 'should allow a promocode to be generated before it has started' do
       @promotion.start_date = (DateTime.now + 1).utc.iso8601
       @promotion.save
 
@@ -239,9 +238,10 @@ describe 'Generate endpoint:', type: :request do
 
       post '/api/v1/generate', params: params, headers: authorization_header
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(201)
 
-      expect(json['errors'][0]['title']).to eq("This promotion has not started, it starts on #{@promotion.start_date.to_s}")
+      expect(Promocode.all.count).to eq(1)
+      expect(json_api_attributes['code']).to eq(Promocode.first.code)
     end
   end
 end
