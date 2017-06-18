@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       # TODO this promotions resource doesn't belong in the public API
       resources :promotions, only: [:create]
       post 'generate', to: 'promocodes#generate'
-      get 'price', to: 'promocodes#price'
+      post 'price', to: 'promocodes#price'
 
     end
   end

@@ -30,7 +30,7 @@ describe 'Generate endpoint:', type: :request do
           type: 'promocodes',
         },
         included: {
-          type: 'promotion',
+          type: 'promotions',
           id: @promotion.id
         }
       }
