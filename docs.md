@@ -34,11 +34,13 @@ Example request body
     "attributes": {
       "code": "WeLoveJohn10",
       "customer_email": "john@prom.io"
+    },
+    "relationships": {
+      "promotion": {
+        "type": "promotions",
+        "id": 13
+      }
     }
-  },
-  "included": {
-    "type": "promotions",
-    "id": 13
   }
 }
 ```
@@ -69,13 +71,15 @@ Example request body
     "attributes": {
       "code": "WeLoveJohn10",
       "customer_email": "john@prom.io"
-    }
-  },
-  "included": {
-    "type": "carts",
-    "attributes": {
-      "item_total": "100.99",
-      "delivery_total": "9.99"
+    },
+    "relationships": {
+      "cart": {
+        "type": "carts",
+        "attributes": {
+          "item_total": "100.99",
+          "delivery_total": "9.99"
+        }
+      }
     }
   }
 }

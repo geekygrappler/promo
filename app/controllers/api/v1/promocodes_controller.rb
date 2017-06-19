@@ -69,7 +69,11 @@ class Api::V1::PromocodesController < ApplicationController
 
   private
   def promocode_params
-    params.require(:data).permit(attributes: [:customer_email, :code])
+    # Doesn't have to require attributes because some promocodes can be generated without any
+    # attributes, just a reference to a promotion.
+    params
+      .require(:data)
+      .permit(attributes: [:customer_email, :code])
   end
 
   def promocode_attributes
@@ -77,15 +81,20 @@ class Api::V1::PromocodesController < ApplicationController
   end
 
   def cart_params
-    params.require(:included).permit(attributes: [:item_total, :delivery_total, :total])
-  end
-
-  def cart_attributes
-    cart_params[:attributes]
+    params
+      .require(:data)
+      .require(:relationships)
+      .require(:cart)
+      .require(:attributes)
+      .permit(:item_total, :delivery_total, :total)
   end
 
   def promotion_params
-    params.require(:included).permit(:id)
+    params
+      .require(:data)
+      .require(:relationships)
+      .require(:promotion)
+      .permit(:id)
   end
 
   def set_promocode
@@ -93,7 +102,7 @@ class Api::V1::PromocodesController < ApplicationController
   end
 
   def set_cart
-    @cart = Cart.new(cart_attributes)
+    @cart = Cart.new(cart_params)
   end
 
   def set_promocode_validator

@@ -42,13 +42,15 @@ describe 'Price endpoint:', type: :request do
             attributes: {
               code: code,
               customer_email: 'hodder@winterfell.com'
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 27,
-              delivery_total: 7
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 27,
+                  delivery_total: 7
+                }
+              }
             }
           }
         }
@@ -69,13 +71,15 @@ describe 'Price endpoint:', type: :request do
             attributes: {
               code: code,
               customer_email: 'theon@pyke.com'
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 99,
-              delivery_total: 9
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 99,
+                  delivery_total: 9
+                }
+              }
             }
           }
         }
@@ -93,12 +97,14 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              'total': 39
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  total: 39
+                }
+              }
             }
           }
         }
@@ -123,13 +129,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 27,
-              delivery_total: 7
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 27,
+                  delivery_total: 7
+                }
+              }
             }
           }
         }
@@ -150,13 +158,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 27,
-              delivery_total: 7
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 27,
+                  delivery_total: 7
+                }
+              }
             }
           }
         }
@@ -180,13 +190,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 60,
-              delivery_total: 7
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 60,
+                  delivery_total: 7
+                }
+              }
             }
           }
         }
@@ -206,13 +218,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 60,
-              delivery_total: 6
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 60,
+                  delivery_total: 6
+                }
+              }
             }
           }
         }
@@ -238,13 +252,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 100,
-              delivery_total: 13
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 100,
+                  delivery_total: 13
+                }
+              }
             }
           }
         }
@@ -271,12 +287,14 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              delivery_total: 13
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  delivery_total: 13
+                }
+              }
             }
           }
         }
@@ -302,13 +320,15 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              item_total: 100,
-              delivery_total: 13
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  item_total: 100,
+                  delivery_total: 13
+                }
+              }
             }
           }
         }
@@ -335,12 +355,14 @@ describe 'Price endpoint:', type: :request do
             type: 'promocodes',
             attributes: {
               code: code
-            }
-          },
-          included: {
-            type: 'carts',
-            attributes: {
-              'total': 113
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                attributes: {
+                  total: 113
+                }
+              }
             }
           }
         }

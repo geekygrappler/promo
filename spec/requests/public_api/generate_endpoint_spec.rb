@@ -28,10 +28,12 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
@@ -59,11 +61,13 @@ describe 'Generate endpoint:', type: :request do
           type: 'promocodes',
           attributes: {
             customer_email: customer_email
+          },
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
           }
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
         }
       }
 
@@ -77,11 +81,13 @@ describe 'Generate endpoint:', type: :request do
     it 'should respond with an error if no customer email is provided' do
       params = {
         data: {
-          type: 'promocodes'
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          type: 'promocodes',
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
@@ -104,11 +110,13 @@ describe 'Generate endpoint:', type: :request do
           type: 'promocodes',
           attributes: {
             customer_email: customer_email
+          },
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
           }
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
         }
       }
 
@@ -134,11 +142,13 @@ describe 'Generate endpoint:', type: :request do
           type: 'promocodes',
           attributes: {
             customer_email: 'billy@blogs.com'
+          },
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
           }
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
         }
       }
 
@@ -158,11 +168,13 @@ describe 'Generate endpoint:', type: :request do
     it 'should generate a promocode' do
       params = {
         data: {
-          type: 'promocodes'
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          type: 'promocodes',
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
@@ -184,10 +196,12 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
@@ -208,10 +222,12 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
@@ -229,10 +245,12 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-        },
-        included: {
-          type: 'promotions',
-          id: @promotion.id
+          relationships: {
+            promotion: {
+              type: 'promotions',
+              id: @promotion.id
+            }
+          }
         }
       }
 
