@@ -8,10 +8,11 @@ class Promotion < ApplicationRecord
   serialize :modifiers, Array
 
   validates :start_date, presence: true
+  validates :name, presence: true
+  validate :promotion_must_contain_promotion_period_constraint
 
 
-  before_validation :set_blank_start_date
-  before_save :add_promotion_period_constraint
+  before_validation :set_blank_start_date, :add_promotion_period_constraint
 
   # TODO would prefer these two to save themselves but before_save :add_promotion_period_constraint will create an infinite
   # loop. Either add guard around add_promotion_period_constraint or come up with a better way of ensuring that
@@ -25,6 +26,7 @@ class Promotion < ApplicationRecord
     # end
     self.constraints.delete_if { |saved_constraint| saved_constraint.class == constraint.class }
     self.constraints.push(constraint)
+    self.save
   end
 
   # Add a modifier to the promotion. It will update the modifier if it already exists.
@@ -32,6 +34,14 @@ class Promotion < ApplicationRecord
   def add_modifier(modifier)
     self.modifiers.delete_if { |saved_modifier| saved_modifier.class == modifier.class}
     self.modifiers.push(modifier)
+    self.save
+  end
+
+
+  def promotion_must_contain_promotion_period_constraint
+    unless promotion_contains_promotion_period_constraint
+      errors.add(:constraints, 'must contain a promotion period constraint')
+    end
   end
 
   private
@@ -45,7 +55,13 @@ class Promotion < ApplicationRecord
   end
 
   # All promotions have period constraint.
+  def promotion_contains_promotion_period_constraint
+    self.constraints.select{ |constraint| constraint.kind_of?(PromotionPeriodConstraint) }.count > 0 ? true : false
+  end
+
   def add_promotion_period_constraint
-    self.add_constraint(PromotionPeriodConstraint.new)
+    unless promotion_contains_promotion_period_constraint
+      self.constraints << PromotionPeriodConstraint.new
+    end
   end
 end

@@ -11,6 +11,11 @@ describe Promotion, type: :model do
 
       expect(promotion.start_date.to_s).to eq(Time.now.utc.to_s)
     end
+
+    it 'will always have a PromotionPeriodConstraint' do
+      expect(promotion.constraints.count).to eq(1)
+      expect(promotion.constraints.first.class.to_s).to eq('Constraints::PromotionPeriodConstraint')
+    end
   end
 
   describe 'adding a constraint' do
@@ -21,8 +26,8 @@ describe Promotion, type: :model do
     it 'should add a constraint' do
       promotion.add_constraint(constraint)
 
-      expect(promotion.constraints.count).to equal(1)
-      expect(promotion.constraints.first).to equal(constraint)
+      expect(promotion.constraints.count).to equal(2)
+      expect(promotion.constraints.last).to equal(constraint)
     end
 
     # TODO figure out how to do this in ruby. Raise is the key word here. Getting closer.
@@ -36,8 +41,8 @@ describe Promotion, type: :model do
       new_constraint = instance_double('SpecificCustomerConstraint')
       promotion.add_constraint(new_constraint)
 
-      expect(promotion.constraints.count).to equal(1)
-      expect(promotion.constraints.first).to equal(new_constraint)
+      expect(promotion.constraints.count).to equal(2)
+      expect(promotion.constraints.last).to equal(new_constraint)
     end
   end
 
