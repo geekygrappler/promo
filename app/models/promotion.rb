@@ -14,9 +14,6 @@ class Promotion < ApplicationRecord
 
   before_validation :set_blank_start_date, :add_promotion_period_constraint
 
-  # TODO would prefer these two to save themselves but before_save :add_promotion_period_constraint will create an infinite
-  # loop. Either add guard around add_promotion_period_constraint or come up with a better way of ensuring that
-  # every promotion has that constraint.
   # Add a constraint to the promotion. It will update the constraint if it already exists.
   # @param [Constraint] constraint class
   # @return void
