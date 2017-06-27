@@ -14,8 +14,8 @@ class CartPricer
   # @return [Cart] A new cart that has had it's prices modified according to the promotion linked to the promcode's modifiers
   def price(cart, promocode)
     new_cart = cart.dup
-    @priced_cart = promocode.promotion.modifiers.reduce(new_cart) { |cart, modifier|
-      modifier.apply(cart)
+    @priced_cart = promocode.promotion.modifiers.reduce(new_cart) { |new_cart, modifier|
+      modifier.apply(new_cart)
     }
   end
 

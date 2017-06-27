@@ -7,7 +7,7 @@ class Promocode < ApplicationRecord
   # Returns any errors related to the constraints on the promotion.
   #
   # @param [Hash] submitted_promocode the promocode submitted for validation
-  # @param [Cart] cart optionally pass the submitted cart (not needed for generate_promocode or some constraints)
+  # @param [OldCart] cart optionally pass the submitted cart (not needed for generate_promocode or some constraints)
   # @return [Array<ConstraintError>]
   def constraint_errors(submitted_promocode, cart = nil)
     self.promotion.constraints.map { |constraint|
@@ -21,9 +21,9 @@ class Promocode < ApplicationRecord
 
   # Returns a *new* cart that has been modified, we must not mess with passed in cart.
   #
-  # @param [Cart] cart the submitted cart
+  # @param [OldCart] cart the submitted cart
   # @raise [Array<ModifierException>] Reason a cart can't be modified
-  # @return [Cart] A new cart that has had it's prices modified according to the promotions modifiers
+  # @return [OldCart] A new cart that has had it's prices modified according to the promotions modifiers
   def price_cart(cart)
     # errors = self.promotion.modifiers.map { |modifier|
     #   modifier.apply(cart)

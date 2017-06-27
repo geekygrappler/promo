@@ -84,7 +84,7 @@ class Api::V1::PublicEndpointsController < ApplicationController
       .require(:relationships)
       .require(:cart)
       .require(:attributes)
-      .permit(:item_total, :delivery_total, :total)
+      .permit(:item_total, :delivery_total, :cart_id)
   end
 
   def promotion_params

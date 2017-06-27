@@ -4,8 +4,8 @@ module Modifiers
   #TODO do these need precedence?
   class Modifier
 
-    # @param [Cart] cart
-    # @return [Cart] the same cart with the modifier applied to it.
+    # @param [OldCart] cart
+    # @return [OldCart] the same cart with the modifier applied to it.
     def apply(cart)
       return cart
     end
@@ -29,8 +29,7 @@ module Modifiers
 
   class PercentageItemsModifier < PercentageModifier
     def apply(cart)
-      # binding.pry
-      cart.update_attr('item_total', cart.item_total * (1 - @percentage))
+      cart.item_total = cart.item_total * (1 - @percentage)
       cart
     end
 
@@ -43,7 +42,7 @@ module Modifiers
 
   class PercentageDeliveryModifier < PercentageModifier
     def apply(cart)
-      cart.update_attr('delivery_total', cart.delivery_total * (1 - @percentage))
+      cart.delivery_total = cart.delivery_total * (1 - @percentage)
       cart
     end
 

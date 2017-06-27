@@ -9,7 +9,7 @@ class CartValidator
   # price a cart.
   #
   # @param [Promocode] promocode
-  # @cart [Cart] cart
+  # @cart [OldCart] cart
   # @return [Array] Array of Error objects
   def validate(promocode, cart)
     @errors = promocode.promotion.modifiers.map { |modifier|
