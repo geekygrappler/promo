@@ -3,7 +3,7 @@ class CreateCarts < ActiveRecord::Migration[5.1]
     create_table :carts do |t|
       t.decimal :item_total
       t.decimal :delivery_total
-      t.string :cart_id
+      t.string :user_cart_id
       t.text :items
 
       t.timestamps

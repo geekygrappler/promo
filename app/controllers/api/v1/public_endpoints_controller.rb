@@ -51,6 +51,9 @@ class Api::V1::PublicEndpointsController < ApplicationController
       @cart_pricer = CartPricer.new
       @discounted_cart = @cart_pricer.price(@cart, @promocode)
       if @discounted_cart
+        discount = Discount.find_or_initialize_by(user_cart_id: @cart.user_cart_id)
+        @cart.discount = discount
+        @discounted_cart.discount = discount
         render json: price_response, status: :ok
       else
         # Should not get here but I'm sure there is a way ;-)
@@ -84,7 +87,7 @@ class Api::V1::PublicEndpointsController < ApplicationController
       .require(:relationships)
       .require(:cart)
       .require(:attributes)
-      .permit(:item_total, :delivery_total, :cart_id)
+      .permit(:item_total, :delivery_total, :user_cart_id)
   end
 
   def promotion_params

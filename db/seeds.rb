@@ -19,3 +19,6 @@ promotion_1.add_modifier(PercentageItemsModifier.new(10))
 promotion_1.save
 
 Promocode.create(code: 'WeLoveJohn10', customer_email: 'john@prom.io', promotion: promotion_1)
+
+Cart.create(item_total: 10)
+Cart.create(item_total: 9)

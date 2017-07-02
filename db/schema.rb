@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170625162837) do
+ActiveRecord::Schema.define(version: 20170702122849) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,10 +26,21 @@ ActiveRecord::Schema.define(version: 20170625162837) do
   create_table "carts", force: :cascade do |t|
     t.decimal "item_total"
     t.decimal "delivery_total"
-    t.string "cart_id"
+    t.string "user_cart_id"
     t.text "items"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.bigint "promocode_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "original_cart_id"
+    t.bigint "discounted_cart_id"
+    t.index ["discounted_cart_id"], name: "index_discounts_on_discounted_cart_id"
+    t.index ["original_cart_id"], name: "index_discounts_on_original_cart_id"
+    t.index ["promocode_id"], name: "index_discounts_on_promocode_id"
   end
 
   create_table "promocodes", force: :cascade do |t|
@@ -60,5 +71,6 @@ ActiveRecord::Schema.define(version: 20170625162837) do
   end
 
   add_foreign_key "api_keys", "users"
+  add_foreign_key "discounts", "promocodes"
   add_foreign_key "promotions", "users"
 end
