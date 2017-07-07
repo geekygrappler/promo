@@ -31,5 +31,9 @@ module Promo
     config.api_only = true
 
     config.autoload_paths += %W(#{config.root}/app/models/promotions)
+
+    config.generators do |g|
+      g.fixture_replacement :factory_girl
+    end
   end
 end
