@@ -83,6 +83,7 @@ module Constraints
 
     def validate_pricing(promocode, submitted_promocode = nil, cart = nil)
       promotion = promocode.promotion
+      # binding.pry
       if promotion.end_date && promotion.end_date < Time.now
         return PromotionPeriodError.new('This promotion has ended')
       end

@@ -18,9 +18,6 @@ class Promotion < ApplicationRecord
   # @param [Constraint] constraint class
   # @return void
   def add_constraint(constraint)
-    # if constraint < Constraints::Constraint
-    #   raise(NameError)
-    # end
     self.constraints.delete_if { |saved_constraint| saved_constraint.class == constraint.class }
     self.constraints.push(constraint)
     self.save

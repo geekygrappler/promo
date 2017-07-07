@@ -33,7 +33,6 @@ describe 'Price endpoint:', type: :request do
     describe 'SpecificCustomer promotions' do
       before(:each) do
         @promotion.add_constraint SpecificCustomerConstraint.new
-        @promotion.save
       end
       it 'should return a price when the correct customer email is passed' do
         params = {
@@ -182,7 +181,6 @@ describe 'Price endpoint:', type: :request do
     describe 'MinimumBasketTotal promotions' do
       before(:each) do
         @promotion.add_constraint(MinimumBasketTotalConstraint.new(67))
-        @promotion.save
       end
       it 'should price a cart that equals or exceeds the minimum basket total' do
         params = {
@@ -244,7 +242,6 @@ describe 'Price endpoint:', type: :request do
     describe 'PercentgeItemsModifier' do
       before(:each) do
         @promotion.add_modifier(PercentageItemsModifier.new(20))
-        @promotion.save
       end
       it 'should return a correctly discounted cart' do
         params = {
@@ -311,7 +308,6 @@ describe 'Price endpoint:', type: :request do
       before(:each) do
         @promotion.add_modifier(PercentageItemsModifier.new(10))
         @promotion.add_modifier(PercentageDeliveryModifier.new(100))
-        @promotion.save
       end
 
       it 'should return a correctly discounted cart' do
@@ -374,6 +370,169 @@ describe 'Price endpoint:', type: :request do
         expect(json['errors'][0]['title']).to match('This promocode requires an item total to be passed in the request')
         expect(json['errors'][1]['title']).to match('This promocode requires a deliver total to be passed in the request')
       end
+    end
+  end
+
+  describe 'Discount Records' do
+    it 'should create a discount record when a cart is priced' do
+      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code,
+            customer_email: 'hodder@winterfell.com'
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              id: 'uniqueId',
+              attributes: {
+                item_total: 27,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/price', params: params, headers: authorization_header
+
+      expect(Discount.first).to be_truthy
+      expect(Discount.count).to eql(1)
+
+      expect(Discount.first.original_cart.user_cart_id).to eql(params[:data][:relationships][:cart][:id])
+      expect(Discount.first.discounted_cart.user_cart_id).to eql(params[:data][:relationships][:cart][:id])
+
+      expect(Discount.first.discounted_cart.item_total).to eql(24.3)
+    end
+
+    it 'should replace an old discount record when a cart is priced again' do
+      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code,
+            customer_email: 'hodder@winterfell.com'
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              id: 'uniqueId',
+              attributes: {
+                item_total: 27,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/price', params: params, headers: authorization_header
+
+      second_params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code,
+            customer_email: 'hodder@winterfell.com'
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              id: 'uniqueId',
+              attributes: {
+                item_total: 50,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/price', params: second_params, headers: authorization_header
+
+      expect(Discount.first).to be_truthy
+      expect(Discount.count).to eql(1)
+
+      expect(Discount.first.original_cart.user_cart_id).to eql(params[:data][:relationships][:cart][:id])
+      expect(Discount.first.discounted_cart.user_cart_id).to eql(params[:data][:relationships][:cart][:id])
+
+      expect(Discount.first.discounted_cart.item_total).to eql(45)
+
+      expect(Discount.first.updated_at).not_to be_nil
+    end
+
+    it 'should be possible to apply multiple codes to a cart and have a separate discount for each promocode' do
+      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code,
+            customer_email: 'hodder@winterfell.com'
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              id: 'uniqueId',
+              attributes: {
+                item_total: 27,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/price', params: params, headers: authorization_header
+
+      second_promotion = Promotion.create(
+        name: promotion_name,
+        start_date: start_date,
+        user: user
+      )
+
+      second_promotion.add_modifier(PercentageDeliveryModifier.new(20))
+
+      second_promocode = Promocode.create(
+        code: 'hello second code',
+        promotion_id: second_promotion.id
+      )
+
+
+      second_params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: 'hello second code',
+            customer_email: 'hodder@winterfell.com'
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              id: 'uniqueId',
+              attributes: {
+                item_total: 24.3,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/price', params: second_params, headers: authorization_header
+
+      first_discount = Discount.first
+      expect(Discount.count).to eql(2)
+      expect(first_discount.original_cart.user_cart_id).to eql(params[:data][:relationships][:cart][:id])
+      expect(first_discount.discounted_cart.item_total).to eql(24.3)
+
+      second_discount = Discount.last
+      expect(second_discount.original_cart.item_total).to eql(24.3)
+      expect(second_discount.discounted_cart.delivery_total).to eql(5.6)
+
     end
   end
 end

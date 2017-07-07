@@ -40,6 +40,7 @@ class Api::V1::PublicEndpointsController < ApplicationController
 
     @cart_validator = CartValidator.new
 
+    # binding.pry
     @cart_validator.validate(@promocode, @cart)
 
     if !@cart_validator.valid?
@@ -51,9 +52,7 @@ class Api::V1::PublicEndpointsController < ApplicationController
       @cart_pricer = CartPricer.new
       @discounted_cart = @cart_pricer.price(@cart, @promocode)
       if @discounted_cart
-        discount = Discount.find_or_initialize_by(user_cart_id: @cart.user_cart_id)
-        @cart.discount = discount
-        @discounted_cart.discount = discount
+        create_discount
         render json: price_response, status: :ok
       else
         # Should not get here but I'm sure there is a way ;-)
@@ -69,6 +68,7 @@ class Api::V1::PublicEndpointsController < ApplicationController
   end
 
   private
+
   def promocode_params
     # Doesn't have to require attributes because some promocodes can be generated without any
     # attributes, just a reference to a promotion.
@@ -104,10 +104,23 @@ class Api::V1::PublicEndpointsController < ApplicationController
 
   def set_cart
     @cart = Cart.new(cart_params)
+    @cart.user_cart_id = params[:data][:relationships][:cart][:id]
   end
 
   def set_promocode_validator
     @promocode_validator = PromocodeValidator.new
+  end
+
+  def create_discount
+    @cart.save
+    @discounted_cart.save
+    @discount = Discount.find_or_initialize_by(user_cart_id: @cart.user_cart_id)
+    # If we're applying a different promocode we need a new Discount.
+    if (@discount.promocode != @promocode)
+      @discount = Discount.new(user_cart_id: @cart.user_cart_id)
+    end
+    @discount.update_attributes(promocode: @promocode, original_cart: @cart, discounted_cart: @discounted_cart)
+    @discount.save
   end
 
   def price_response
