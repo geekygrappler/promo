@@ -31,7 +31,7 @@ RSpec.describe 'Promotions API', type: :request do
   # TODO move to an authorisation test file. Not related to the promotions endpoint.
   describe 'token access' do
     it 'creates a promotion when a valid access_token is provided' do
-      post '/api/v1/promotions', params: default_params, headers: authorization_header
+      post '/api/v1//promotions', params: default_params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -46,7 +46,7 @@ RSpec.describe 'Promotions API', type: :request do
         'Authorization': 'Some bollocks'
       }
 
-      post '/api/v1/promotions', headers: headers
+      post '/api/v1//promotions', headers: headers
 
       expect(response).to have_http_status(401)
 
@@ -58,7 +58,7 @@ RSpec.describe 'Promotions API', type: :request do
     it 'should allow no end date to be supplied' do
       default_params[:data][:attributes][:end_date] = nil
 
-      post '/api/v1/promotions', params: default_params, headers: authorization_header
+      post '/api/v1//promotions', params: default_params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -68,7 +68,7 @@ RSpec.describe 'Promotions API', type: :request do
     it 'should allow no start date and set it to right now' do
       default_params[:data][:attributes][:start_date] = nil
 
-      post '/api/v1/promotions', params: default_params, headers: authorization_header
+      post '/api/v1//promotions', params: default_params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 

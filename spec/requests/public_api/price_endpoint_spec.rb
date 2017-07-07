@@ -54,7 +54,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(200)
 
@@ -83,7 +83,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -108,7 +108,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -141,7 +141,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -170,7 +170,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -201,7 +201,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(200)
 
@@ -229,7 +229,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -262,7 +262,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(200)
 
@@ -296,7 +296,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -329,7 +329,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(200)
 
@@ -363,7 +363,7 @@ describe 'Price endpoint:', type: :request do
           }
         }
 
-        post '/api/v1/price', params: params, headers: authorization_header
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
         expect(response).to have_http_status(422)
 
@@ -396,7 +396,7 @@ describe 'Price endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/price', params: params, headers: authorization_header
+      post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
       expect(Discount.first).to be_truthy
       expect(Discount.count).to eql(1)
@@ -429,7 +429,7 @@ describe 'Price endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/price', params: params, headers: authorization_header
+      post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
       second_params = {
         data: {
@@ -451,7 +451,7 @@ describe 'Price endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/price', params: second_params, headers: authorization_header
+      post '/api/v1/promocodes/price', params: second_params, headers: authorization_header
 
       expect(Discount.first).to be_truthy
       expect(Discount.count).to eql(1)
@@ -486,7 +486,7 @@ describe 'Price endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/price', params: params, headers: authorization_header
+      post '/api/v1/promocodes/price', params: params, headers: authorization_header
 
       second_promotion = Promotion.create(
         name: promotion_name,
@@ -522,7 +522,7 @@ describe 'Price endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/price', params: second_params, headers: authorization_header
+      post '/api/v1/promocodes/price', params: second_params, headers: authorization_header
 
       first_discount = Discount.first
       expect(Discount.count).to eql(2)

@@ -1,4 +1,4 @@
-class Api::V1::PublicEndpointsController < ApplicationController
+class Api::V1::Promocodes::PublicEndpointsController < ApplicationController
   include Authorisation
   include JsonApi
 

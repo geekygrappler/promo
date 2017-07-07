@@ -23,7 +23,7 @@ Base `/api/v1`
 Generate a promocode for one of your promotions.
 
 ```
-https://promio-test.herokuapp.com/api/v1/generate
+https://promio-test.herokuapp.com/api/v1/promocodes/generate
 METHOD: POST
 ```
 Example request body
@@ -60,7 +60,7 @@ included key.
 Price a promocode for a given cart.
 
 ```
-https://promio-test.herokuapp.com/api/v1/price
+https://promio-test.herokuapp.com/api/v1/promocodes/price
 METHOD: POST
 ```
 Example request body

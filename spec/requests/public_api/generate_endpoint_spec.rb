@@ -37,7 +37,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -71,7 +71,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -91,7 +91,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(422)
 
@@ -120,7 +120,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -152,7 +152,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(422)
 
@@ -178,7 +178,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
@@ -205,7 +205,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(422)
 
@@ -231,7 +231,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(422)
 
@@ -254,7 +254,7 @@ describe 'Generate endpoint:', type: :request do
         }
       }
 
-      post '/api/v1/generate', params: params, headers: authorization_header
+      post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
       expect(response).to have_http_status(201)
 
