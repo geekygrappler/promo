@@ -7,7 +7,9 @@ Rails.application.routes.draw do
       namespace :promocodes do
         post 'generate', to: 'public_endpoints#generate'
         post 'price', to: 'public_endpoints#price'
-        post 'redeem', to: 'public_endpoints#redeem'
+      end
+      namespace :carts do
+        post 'redeem', to: 'public_carts#redeem'
       end
     end
   end

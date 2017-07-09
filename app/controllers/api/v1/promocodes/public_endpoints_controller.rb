@@ -6,7 +6,7 @@ class Api::V1::Promocodes::PublicEndpointsController < ApplicationController
   before_action :set_promocode, :set_cart, only: [:price]
   before_action :set_promocode_validator, only:[:generate, :price]
 
-  # POST '/api/v#/generate'
+  # POST '/api/v1/promocodes/generate'
   # Generate a promocode for a Multiple Promotion
   def generate
     @promocode = Promocode.new(promocode_attributes)
@@ -28,7 +28,7 @@ class Api::V1::Promocodes::PublicEndpointsController < ApplicationController
     end
   end
 
-  # GET '/api/v#/price'
+  # POST '/api/v1/promocodes/price'
   # Price a cart based on a promotion that owns the passed in promocode
   def price
     # binding.pry
@@ -57,11 +57,11 @@ class Api::V1::Promocodes::PublicEndpointsController < ApplicationController
       else
         # Should not get here but I'm sure there is a way ;-)
         render json: {
-          errors: errors.map { |error|
+          errors: [
             {
               title: 'Server failed to price the cart :-('
             }
-          }
+          ]
         }, status: :internal_server_error
       end
     end
