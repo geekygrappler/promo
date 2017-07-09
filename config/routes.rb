@@ -5,8 +5,8 @@ Rails.application.routes.draw do
       resources :promotions, only: [:create]
 
       namespace :promocodes do
-        post 'generate', to: 'public_endpoints#generate'
-        post 'price', to: 'public_endpoints#price'
+        post 'generate', to: 'public_promocodes#generate'
+        post 'price', to: 'public_promocodes#price'
       end
       namespace :carts do
         post 'redeem', to: 'public_carts#redeem'
