@@ -62,4 +62,19 @@ describe 'Redeem endpoint', type: :request do
     expect(redemption.promocodes.first).to eql(@promocode)
     expect(redemption.promocodes.last).to eql(@second_promocode)
   end
+
+  it 'should provide an error if we pass in a cart that has not been previously priced and has no discount record' do
+    params = {
+      data: {
+        type: 'carts',
+        id: 'We\'ve never priced this cart before'
+      }
+    }
+
+    post '/api/v1/carts/redeem', params: params, headers: authorization_header
+
+    expect(response).to have_http_status(422)
+
+    expect(json['errors'][0]['title']).to eq('This cart has not been priced for a promocode with this service before, therefore we can\'t redeem it')
+  end
 end

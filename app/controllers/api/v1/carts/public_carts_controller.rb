@@ -13,6 +13,17 @@ class Api::V1::Carts::PublicCartsController < ApplicationController
     )
 
     @discounts = find_discount_for_redemption
+
+    if @discounts.empty?
+      render json: {
+        errors: [
+          {
+            title: 'This cart has not been priced for a promocode with this service before, therefore we can\'t redeem it'
+          }
+        ]
+      }, status: :unprocessable_entity and return
+    end
+
     @discounts.each do |discount|
       discount.redemption = @redemption
       discount.save
