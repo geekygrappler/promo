@@ -16,6 +16,7 @@ describe 'Redeem endpoint', type: :request do
 
   before(:each) do
     @discount = build(:discount)
+    @discount.user_cart_id = 'uniqueId'
     @discount.save
     @promocode = @discount.promocode
   end
@@ -35,5 +36,30 @@ describe 'Redeem endpoint', type: :request do
     expect(Redemption.all.count).to eql(1)
     redemption = Redemption.first
     expect(redemption.promocodes.first).to eql(@promocode)
+  end
+
+  it 'should create a redemption for a cart that has two discount records' do
+    # Create a second discount record
+    @second_discount = build(:discount)
+    @second_discount.user_cart_id = 'uniqueId'
+    @second_discount.save
+    @second_promocode = @second_discount.promocode
+
+    params = {
+      data: {
+        type: 'carts',
+        id: @discount.user_cart_id
+      }
+    }
+
+    post '/api/v1/carts/redeem', params: params, headers: authorization_header
+
+    expect(response).to have_http_status(200)
+
+    expect(Redemption.all.count).to eql(1)
+    redemption = Redemption.first
+    expect(redemption.promocodes.count).to eql(2)
+    expect(redemption.promocodes.first).to eql(@promocode)
+    expect(redemption.promocodes.last).to eql(@second_promocode)
   end
 end

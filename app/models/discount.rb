@@ -8,4 +8,6 @@ class Discount < ApplicationRecord
 
   belongs_to :original_cart, class_name: 'Cart'
   belongs_to :discounted_cart, class_name: 'Cart'
+
+  # TODO user_cart_id should be from original_cart, also original_cart.user_cart_id === discount_cart.user_cart_id
 end
