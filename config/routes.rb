@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
+  resources :promotions
+
+  # The public endpoints
   namespace :api do
     namespace :v1 do
-      # TODO this promotions resource doesn't belong in the public API
-      resources :promotions, only: [:create]
-
       namespace :promocodes do
         post 'generate', to: 'public_promocodes#generate'
         post 'price', to: 'public_promocodes#price'
