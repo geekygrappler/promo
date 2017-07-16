@@ -11,6 +11,12 @@ module Constraints
   # Abstract class for a constraint
   # Code smell I don't think I should have an abstract class.
   class Constraint
+
+    # This will be called only when pricing a promocode or generating one so promotion and promocode will always be available.
+    # def initialize(promotion, promocode)
+    #
+    # end
+
     # Check the submitted promocode is valid to be generated
     def validate_generation(promocode, submitted_promocode = nil)
       true
