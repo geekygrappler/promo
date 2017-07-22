@@ -239,9 +239,9 @@ describe 'Price endpoint:', type: :request do
   end
 
   describe 'Modifiers:' do
-    describe 'PercentgeItemsModifier' do
+    describe 'ItemsPercentageModifier' do
       before(:each) do
-        @promotion.add_modifier(PercentageItemsModifier.new(20))
+        @promotion.add_modifier('ItemsPercentageModifier', { items_percentage_discount: 20 })
       end
       it 'should return a correctly discounted cart' do
         params = {
@@ -304,10 +304,10 @@ describe 'Price endpoint:', type: :request do
       end
     end
 
-    describe 'PercentageItemsModifier AND PercentageDeliveryModifier' do
+    describe 'ItemsPercentageModifier AND DeliveryPercentageModifier' do
       before(:each) do
-        @promotion.add_modifier(PercentageItemsModifier.new(10))
-        @promotion.add_modifier(PercentageDeliveryModifier.new(100))
+        @promotion.add_modifier('ItemsPercentageModifier', { items_percentage_discount: 10 })
+        @promotion.add_modifier('DeliveryPercentageModifier', { delivery_percentage_discount: 100 })
       end
 
       it 'should return a correctly discounted cart' do
@@ -375,7 +375,7 @@ describe 'Price endpoint:', type: :request do
 
   describe 'Discount Records' do
     it 'should create a discount record when a cart is priced' do
-      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      @promotion.add_modifier('ItemsPercentageModifier', { items_percentage_discount: 10 })
       params = {
         data: {
           type: 'promocodes',
@@ -408,7 +408,7 @@ describe 'Price endpoint:', type: :request do
     end
 
     it 'should replace an old discount record when a cart is priced again' do
-      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      @promotion.add_modifier('ItemsPercentageModifier', { items_percentage_discount: 10 })
       params = {
         data: {
           type: 'promocodes',
@@ -465,7 +465,7 @@ describe 'Price endpoint:', type: :request do
     end
 
     it 'should be possible to apply multiple codes to a cart and have a separate discount for each promocode' do
-      @promotion.add_modifier(PercentageItemsModifier.new(10))
+      @promotion.add_modifier('ItemsPercentageModifier', { items_percentage_discount: 10 })
       params = {
         data: {
           type: 'promocodes',
@@ -494,7 +494,7 @@ describe 'Price endpoint:', type: :request do
         user: user
       )
 
-      second_promotion.add_modifier(PercentageDeliveryModifier.new(20))
+      second_promotion.add_modifier('DeliveryPercentageModifier', { delivery_percentage_discount: 20 })
 
       second_promocode = Promocode.create(
         code: 'hello second code',

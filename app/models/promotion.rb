@@ -11,7 +11,6 @@ class Promotion < ApplicationRecord
   validates :name, presence: true
   validate :promotion_must_contain_promotion_period_constraint
 
-
   before_validation :set_blank_start_date, :add_promotion_period_constraint
 
   # Add a constraint to the promotion. It will update the constraint if it already exists.
@@ -24,10 +23,12 @@ class Promotion < ApplicationRecord
   end
 
   # Add a modifier to the promotion. It will update the modifier if it already exists.
-  # @param [Modifier] modifier class
-  def add_modifier(modifier)
-    self.modifiers.delete_if { |saved_modifier| saved_modifier.class == modifier.class}
+  # @param [String] modifier class name
+  # @param [Hash] Options TODO validate options, but for now assume correct option passed with correct modifier
+  def add_modifier(modifier, options = {})
+    self.modifiers.delete_if { |saved_modifier| saved_modifier == modifier}
     self.modifiers.push(modifier)
+    self.update_attributes(options)
     self.save
   end
 

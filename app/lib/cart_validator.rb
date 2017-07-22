@@ -13,6 +13,7 @@ class CartValidator
   # @return [Array] Array of Error objects
   def validate(promocode, cart)
     @errors = promocode.promotion.modifiers.map { |modifier|
+      modifier = Modifiers.const_get(modifier).new(promocode, promocode.promotion)
       modifier.validate(cart)
     }.select{ |error| !error.nil? }
   end

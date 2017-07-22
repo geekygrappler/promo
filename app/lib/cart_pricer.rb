@@ -1,4 +1,5 @@
 class CartPricer
+  include Modifiers
   attr_reader :priced_cart
 
   def initialize
@@ -14,9 +15,14 @@ class CartPricer
   # @return [Cart] A new cart that has had it's prices modified according to the promotion linked to the promcode's modifiers
   def price(cart, promocode)
     new_cart = cart.dup
-    @priced_cart = promocode.promotion.modifiers.reduce(new_cart) { |new_cart, modifier|
+    promotion = promocode.promotion
+    @priced_cart = promotion.modifiers.reduce(new_cart) { |new_cart, modifier|
+      modifier = Modifiers.const_get(modifier).new(promocode, promotion)
       modifier.apply(new_cart)
     }
+    # @priced_cart = promocode.promotion.modifiers.reduce(new_cart) { |new_cart, modifier|
+    #   modifier.apply(new_cart)
+    # }
   end
 
   # Returns a Hash with the differences in prices for two carts

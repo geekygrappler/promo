@@ -1,5 +1,3 @@
-#TODO should probably be a Pricing Validator and a Generation Validator because we have totally
-#different requirements at those times. E.g. validation at pricing definitely requires a cart.
 class PromocodeValidator
   attr_reader :errors
 

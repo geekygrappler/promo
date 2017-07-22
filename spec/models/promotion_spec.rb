@@ -47,21 +47,22 @@ describe Promotion, type: :model do
   end
 
   describe 'adding a modifier' do
-    let(:modifier) { instance_double('AbsoluteTotalModifier')}
+    let(:modifier) {'TotalAbsoluteModifier'}
     it 'should add a modifier' do
-      promotion.add_modifier(modifier)
+      promotion.add_modifier(modifier, { total_absolute_discount: 20 })
 
       expect(promotion.modifiers.count).to eq(1)
       expect(promotion.modifiers.first).to eq(modifier)
+      expect(promotion.total_absolute_discount).to eq(20)
     end
 
     it 'should replace an exisiting modifier with the new modifier' do
-      promotion.add_modifier(modifier)
-      new_modifier = instance_double('AbsoluteTotalModifier')
-      promotion.add_modifier(new_modifier)
+      promotion.add_modifier(modifier, { total_absolute_discount: 20 })
+      promotion.add_modifier(modifier, { total_absolute_discount: 30 })
 
       expect(promotion.modifiers.count).to eq(1)
-      expect(promotion.modifiers.first).to eq(new_modifier)
+      expect(promotion.modifiers.first).to eq(modifier)
+      expect(promotion.total_absolute_discount).to eq(30)
     end
   end
 end
