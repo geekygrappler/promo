@@ -32,7 +32,7 @@ describe 'Price endpoint:', type: :request do
   describe 'Constraints:' do
     describe 'SpecificCustomer promotions' do
       before(:each) do
-        @promotion.add_constraint SpecificCustomerConstraint.new
+        @promotion.add_constraint 'SpecificCustomerConstraint'
       end
       it 'should return a price when the correct customer email is passed' do
         params = {
@@ -180,7 +180,7 @@ describe 'Price endpoint:', type: :request do
 
     describe 'MinimumBasketTotal promotions' do
       before(:each) do
-        @promotion.add_constraint(MinimumBasketTotalConstraint.new(67))
+        @promotion.add_constraint('MinimumBasketTotalConstraint', { minimum_basket_total: 67 })
       end
       it 'should price a cart that equals or exceeds the minimum basket total' do
         params = {

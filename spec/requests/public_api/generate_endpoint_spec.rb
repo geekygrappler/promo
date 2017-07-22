@@ -52,7 +52,7 @@ describe 'Generate endpoint:', type: :request do
 
   describe 'SpecificCustomer promotions' do
     before(:each) do
-      @promotion.add_constraint SpecificCustomerConstraint.new
+      @promotion.add_constraint 'SpecificCustomerConstraint'
       @promotion.save
     end
     it 'should generate a new promocode when given a customer email' do
@@ -101,7 +101,7 @@ describe 'Generate endpoint:', type: :request do
 
   describe 'OnePerCustomer promotions' do
     before(:each) do
-      @promotion.add_constraint OnePerCustomerConstraint.new
+      @promotion.add_constraint 'OnePerCustomerConstraint'
       @promotion.save
     end
     it 'should generate a promocode for a customer' do
@@ -162,7 +162,7 @@ describe 'Generate endpoint:', type: :request do
 
   describe 'SinglePromocode promotion' do
     before(:each) do
-      @promotion.add_constraint SinglePromocodeConstraint.new
+      @promotion.add_constraint 'SinglePromocodeConstraint'
       @promotion.save
     end
     it 'should generate a promocode' do

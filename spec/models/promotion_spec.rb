@@ -14,35 +14,27 @@ describe Promotion, type: :model do
 
     it 'will always have a PromotionPeriodConstraint' do
       expect(promotion.constraints.count).to eq(1)
-      expect(promotion.constraints.first.class.to_s).to eq('Constraints::PromotionPeriodConstraint')
+      expect(promotion.constraints.first).to eq('PromotionPeriodConstraint')
     end
   end
 
   describe 'adding a constraint' do
-    let(:constraint) { instance_double('SpecificCustomerConstraint') }
-    before(:each) do
-      allow(constraint).to receive(:<).and_return(true)
-    end
     it 'should add a constraint' do
+      constraint = 'SpecificCustomerConstraint'
       promotion.add_constraint(constraint)
 
-      expect(promotion.constraints.count).to equal(2)
-      expect(promotion.constraints.last).to equal(constraint)
+      expect(promotion.constraints.count).to eq(2)
+      expect(promotion.constraints.last).to eq(constraint)
     end
-
-    # TODO figure out how to do this in ruby. Raise is the key word here. Getting closer.
-    # it 'should raise an error if not passed a constraint' do
-    #   allow(constraint).to receive(:<).and_return(true)
-    #   expect{ promotion.add_constraint('foo') }.to raise_error(NameError)
-    # end
 
     it 'should replace an existing constraint with the new constraint' do
-      promotion.add_constraint(constraint)
-      new_constraint = instance_double('SpecificCustomerConstraint')
-      promotion.add_constraint(new_constraint)
+      constraint = 'MinimumBasketTotalConstraint'
+      promotion.add_constraint(constraint, { minimum_basket_total: 100 })
+      promotion.add_constraint(constraint, { minimum_basket_total: 100.50 })
 
-      expect(promotion.constraints.count).to equal(2)
-      expect(promotion.constraints.last).to equal(new_constraint)
+      expect(promotion.constraints.count).to eq(2)
+      expect(promotion.constraints.last).to eq(constraint)
+      expect(promotion.minimum_basket_total).to eq(100.50)
     end
   end
 

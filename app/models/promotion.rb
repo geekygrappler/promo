@@ -14,17 +14,19 @@ class Promotion < ApplicationRecord
   before_validation :set_blank_start_date, :add_promotion_period_constraint
 
   # Add a constraint to the promotion. It will update the constraint if it already exists.
-  # @param [Constraint] constraint class
+  # @param [String] constraint class
+  # @param [Hash] options TODO validate options, but for now assume correct option passed with correct modifier
   # @return void
-  def add_constraint(constraint)
-    self.constraints.delete_if { |saved_constraint| saved_constraint.class == constraint.class }
+  def add_constraint(constraint, options = {})
+    self.constraints.delete_if { |saved_constraint| saved_constraint == constraint }
     self.constraints.push(constraint)
+    self.update_attributes(options)
     self.save
   end
 
   # Add a modifier to the promotion. It will update the modifier if it already exists.
   # @param [String] modifier class name
-  # @param [Hash] Options TODO validate options, but for now assume correct option passed with correct modifier
+  # @param [Hash] options TODO validate options, but for now assume correct option passed with correct modifier
   def add_modifier(modifier, options = {})
     self.modifiers.delete_if { |saved_modifier| saved_modifier == modifier}
     self.modifiers.push(modifier)
@@ -51,12 +53,12 @@ class Promotion < ApplicationRecord
 
   # All promotions have period constraint.
   def promotion_contains_promotion_period_constraint
-    self.constraints.select{ |constraint| constraint.kind_of?(PromotionPeriodConstraint) }.count > 0 ? true : false
+    self.constraints.select{ |constraint| constraint == 'PromotionPeriodConstraint' }.count > 0 ? true : false
   end
 
   def add_promotion_period_constraint
     unless promotion_contains_promotion_period_constraint
-      self.constraints << PromotionPeriodConstraint.new
+      self.constraints << 'PromotionPeriodConstraint'
     end
   end
 end
