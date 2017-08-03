@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
+  devise_for :users, controllers: { sessions: 'sessions' }
   resources :promotions
+  # devise_for :users, controllers: { sessions: 'sessions' }
 
   # The public endpoints
   namespace :api do
