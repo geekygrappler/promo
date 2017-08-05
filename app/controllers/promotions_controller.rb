@@ -1,6 +1,6 @@
 class PromotionsController < ApplicationController
   def index
-    @promotions = Promotion.all
+    @promotions = current_user.promotions
     render json: @promotions
   end
 end
