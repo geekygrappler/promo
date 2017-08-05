@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { sessions: 'sessions' }
+  devise_for :users, controllers: { sessions: 'sessions', registrations: 'registrations' }, defaults: { format: :json }
   resources :promotions
-  # devise_for :users, controllers: { sessions: 'sessions' }
 
   # The public endpoints
   namespace :api do
