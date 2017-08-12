@@ -13,6 +13,11 @@ class PromotionsController < ApplicationController
     end
   end
 
+  def show
+    promotion = Promotion.find(params[:id])
+    render json: promotion
+  end
+
   private
 
   def promotion_params
