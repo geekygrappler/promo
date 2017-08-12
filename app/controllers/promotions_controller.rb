@@ -24,8 +24,19 @@ class PromotionsController < ApplicationController
     params
       .require(:data)
       .require(:attributes)
-      .permit(:name, :constraints, :modifiers, :start_date, :end_date)
-
+      .permit(
+        :name,
+        :start_date,
+        :end_date,
+        :items_percentage_discount,
+        :delivery_percentage_discount,
+        :total_percentage_discount,
+        :items_absolute_discount,
+        :delivery_absolute_discount,
+        :total_absolute_discount,
+        constraints: [],
+        modifiers: []
+      )
   end
 
 end
