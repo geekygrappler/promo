@@ -18,7 +18,7 @@ module Constraints
     # end
 
     # Check the submitted promocode is valid to be generated
-    def validate_generation(promocode, submitted_promocode = nil)
+    def validate_generation(promocode)
       true
     end
 
@@ -33,9 +33,9 @@ module Constraints
   # this means a customer email must be provided at time of generation, and that specific promocode can
   # only be redeemed by that customer.
   class SpecificCustomerConstraint < Constraint
-    def validate_generation(promocode, submitted_promocode)
+    def validate_generation(promocode)
       # This is the case when we are generating a promocode but not supplying a customer email (dev error)
-      if submitted_promocode.nil?
+      if promocode.customer_email.nil?
         return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
       end
     end
@@ -54,7 +54,7 @@ module Constraints
   end
 
   class SinglePromocodeConstraint < Constraint
-    def validate_generation(promocode, submitted_promocode = nil)
+    def validate_generation(promocode)
       promotion = promocode.promotion
       if !promotion.promocodes.empty?
         return SinglePromocodeError.new('This promotion is limited to one promocode and already has one')
@@ -66,8 +66,8 @@ module Constraints
   # It means any customer is entitled to the promotion, but a promocode will be linked to a customer email
   # and they can only have one promocode.
   class OnePerCustomerConstraint < Constraint
-    def validate_generation(promocode, submitted_promocode = nil)
-      if Promocode.find_by_customer_email(submitted_promocode[:customer_email])
+    def validate_generation(promocode)
+      if Promocode.find_by_customer_email(promocode[:customer_email])
         return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
       end
     end
@@ -80,7 +80,7 @@ module Constraints
   end
 
   class PromotionPeriodConstraint < Constraint
-    def validate_generation(promocode, submitted_promocode = nil)
+    def validate_generation(promocode)
       promotion = promocode.promotion
       if promotion.end_date && promotion.end_date < Time.now
         return PromotionPeriodError.new('This promotion has ended')

@@ -6,10 +6,10 @@ class PromocodeValidator
     @errors = []
   end
 
-  def validate_generation(promocode_record = nil, submitted_promocode = nil)
+  def validate_generation(promocode_record = nil)
     @errors = promocode_record.promotion.constraints.map { |constraint|
       constraint = Constraints.const_get(constraint).new
-      constraint.validate_generation(promocode_record, submitted_promocode)
+      constraint.validate_generation(promocode_record)
     }.select{ |error| !error.nil? }
   end
 

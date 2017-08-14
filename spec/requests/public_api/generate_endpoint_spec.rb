@@ -76,7 +76,7 @@ describe 'Generate endpoint:', type: :request do
       expect(response).to have_http_status(201)
 
       promocode = Promocode.first
-      expect(json_api_attributes['customer-email']).to eq(promocode.customer_email)
+      expect(json_api_attributes['customer_email']).to eq(promocode.customer_email)
     end
     it 'should respond with an error if no customer email is provided' do
       params = {
@@ -125,7 +125,7 @@ describe 'Generate endpoint:', type: :request do
       expect(response).to have_http_status(201)
 
       promocode = Promocode.first
-      expect(json_api_attributes['customer-email']).to eq(promocode.customer_email)
+      expect(json_api_attributes['customer_email']).to eq(promocode.customer_email)
     end
     it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
           once promocode per customer' do

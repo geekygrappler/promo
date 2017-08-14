@@ -12,7 +12,7 @@ class Api::V1::Promocodes::PublicPromocodesController < ApplicationController
     @promocode = Promocode.new(promocode_attributes)
     @promocode.promotion = Promotion.find(promotion_params[:id])
 
-    @promocode_validator.validate_generation(@promocode, promocode_attributes)
+    @promocode_validator.validate_generation(@promocode)
 
     if @promocode_validator.valid?
       if promocode_attributes.nil? or promocode_attributes[:code].nil?
