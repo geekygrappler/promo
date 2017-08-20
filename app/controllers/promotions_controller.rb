@@ -32,9 +32,9 @@ class PromotionsController < ApplicationController
         :items_absolute_discount,
         :delivery_absolute_discount,
         :total_absolute_discount,
+        :minimum_basket_total,
         constraints: [],
         modifiers: []
       )
   end
-
 end
