@@ -19,12 +19,12 @@ module Constraints
 
     # Check the submitted promocode is valid to be generated
     def validate_generation(promocode)
-      true
+      nil
     end
 
     # Check the submitted promocode is valid for pricing
     def validate_pricing(promocode, submitted_promocode = nil, cart = nil)
-      true
+      nil
     end
   end
 
