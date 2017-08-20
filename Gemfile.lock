@@ -198,7 +198,6 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (~> 0.10.0)
-  byebug
   debase
   devise
   factory_girl_rails
@@ -215,10 +214,9 @@ DEPENDENCIES
   simple_token_authentication (~> 1.0)
   spring
   spring-watcher-listen (~> 2.0.0)
-  tzinfo-data
 
 RUBY VERSION
    ruby 2.4.0p0
 
 BUNDLED WITH
-   1.15.1
+   1.15.3
