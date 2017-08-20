@@ -8,9 +8,7 @@ class PromotionsController < ApplicationController
     user = current_user
     promotion = Promotion.new(promotion_params)
     promotion.user = user
-    if promotion.save
-      render json: promotion
-    end
+    render json: promotion if promotion.save
   end
 
   def show
