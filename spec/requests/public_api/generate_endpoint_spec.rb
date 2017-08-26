@@ -108,9 +108,6 @@ describe 'Generate endpoint:', type: :request do
       params = {
         data: {
           type: 'promocodes',
-          attributes: {
-            customer_email: customer_email
-          },
           relationships: {
             promotion: {
               type: 'promotions',
@@ -127,21 +124,17 @@ describe 'Generate endpoint:', type: :request do
       promocode = Promocode.first
       expect(json_api_attributes['customer_email']).to eq(promocode.customer_email)
     end
-    it 'should respond with an error if the customer already has a promocode and the promotion is restricted to
-          once promocode per customer' do
+    it 'should respond with an error if there is already a promocode with the same code' do
       Promocode.create(
-        {
-          code: 'xyz123',
-          customer_email: 'billy@blogs.com',
-          promotion: @promotion
-        }
+        code: 'xyz',
+        promotion: @promotion
       )
 
       params = {
         data: {
           type: 'promocodes',
           attributes: {
-            customer_email: 'billy@blogs.com'
+            code: 'xyz'
           },
           relationships: {
             promotion: {
@@ -154,9 +147,7 @@ describe 'Generate endpoint:', type: :request do
 
       post '/api/v1/promocodes/generate', params: params, headers: authorization_header
 
-      expect(response).to have_http_status(422)
-
-      expect(json['errors'][0]['title']).to eq('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
+      expect(json['errors'][0]['title']).to eq('This promotion already has a promocode with this code')
     end
   end
 

@@ -67,8 +67,8 @@ module Constraints
   # and they can only have one promocode.
   class OnePerCustomerConstraint < Constraint
     def validate_generation(promocode)
-      if Promocode.find_by_customer_email(promocode[:customer_email])
-        return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
+      if promocode.promotion.promocodes.include?(Promocode.find_by(code: promocode.code))
+        ConstraintError.new('This promotion already has a promocode with this code')
       end
     end
 
