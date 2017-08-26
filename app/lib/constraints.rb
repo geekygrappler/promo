@@ -73,8 +73,14 @@ module Constraints
     end
 
     def validate_pricing(promocode, submitted_promocode, cart = nil)
-      if Promocode.find_by_customer_email(submitted_promocode[:customer_email])
-        return UniqueCustomerGenerationError.new('This customer already has a promocode for this promotion, and it\'s limited to one per customer')
+      # TODO This method can be composed, i.e. this is a constraint that requires an email as does SinglePromocodeConstraint
+      # So don't use inheritence. Sandi Metz
+      if submitted_promocode && submitted_promocode[:customer_email].nil?
+        return SpecificCustomerConstraintError.new('This promotion requires a customer email, please supply one')
+      end
+
+      if (cart && Redemption.find_by(user_cart_id: cart.user_cart_id))
+        return UniqueCustomerGenerationError.new('You have already redeemed this discount and it\'s limited to one use per person')
       end
     end
   end

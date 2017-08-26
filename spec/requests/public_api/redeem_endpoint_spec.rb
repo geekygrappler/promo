@@ -18,7 +18,7 @@ describe 'Redeem endpoint', type: :request do
     @discount = build(:discount)
     @discount.user_cart_id = 'uniqueId'
     @discount.save
-    @promocode = @discount.promocode
+    @promocode = @discount.promxocode
   end
 
   it 'should create a redemption for a cart that has a discount record' do

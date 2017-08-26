@@ -58,6 +58,8 @@ describe 'Price endpoint:', type: :request do
 
         expect(response).to have_http_status(200)
 
+        expect(Discount.count).to be(1)
+
         expect(json_api_attributes['discounted-total']).to eq('34.0')
         expect(json_api_attributes['discounted-item-total']).to eq('27.0')
         expect(json_api_attributes['discounted-delivery-total']).to eq('7.0')
@@ -116,6 +118,74 @@ describe 'Price endpoint:', type: :request do
 
       end
     end
+
+    describe 'OnePerCustomerConstraint promotion' do
+      before(:each) do
+        @promotion.add_constraint 'OnePerCustomerConstraint'
+      end
+      it 'should return a price when priced' do
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code,
+              customer_email: 'brownbear@bo.com'
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                id: 'CartId',
+                attributes: {
+                  item_total: 27,
+                  delivery_total: 7
+                }
+              }
+            }
+          }
+        }
+
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
+
+        expect(response).to have_http_status(200)
+
+        expect(Discount.count).to be(1)
+
+        expect(json_api_attributes['discounted-total']).to eq('34.0')
+        expect(json_api_attributes['discounted-item-total']).to eq('27.0')
+        expect(json_api_attributes['discounted-delivery-total']).to eq('7.0')
+      end
+      it 'should prevent a promocode being used if we already have a redemption for that user' do
+        Redemption.create(user_cart_id: 'CartId')
+
+        params = {
+          data: {
+            type: 'promocodes',
+            attributes: {
+              code: code,
+              customer_email: 'brownbear@bo.com'
+            },
+            relationships: {
+              cart: {
+                type: 'carts',
+                id: 'CartId',
+                attributes: {
+                  total: 39
+                }
+              }
+            }
+          }
+        }
+
+        post '/api/v1/promocodes/price', params: params, headers: authorization_header
+
+        expect(json['errors'][0]['title']).to match(
+          'You have already redeemed this discount and it\'s limited to one use per person'
+        )
+      end
+
+      it 'should create a discount recor'
+    end
+
 
     describe 'Promotion period constraints on promotions' do
       it 'should prevent a promocode being used after the promotion has ended' do

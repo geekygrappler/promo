@@ -47,23 +47,21 @@ class Api::V1::Promocodes::PublicPromocodesController < ApplicationController
       render json: json_api_error_response(@cart_validator.errors), status: :unprocessable_entity and return
     end
 
-    if @promocode_validator.valid? && @cart_validator.valid?
-      # TODO wrap in begin rescue. Should never have this failing as the promocode & cart are valid so throw a 500
-      @cart_pricer = CartPricer.new
-      @discounted_cart = @cart_pricer.price(@cart, @promocode)
-      if @discounted_cart
-        create_discount
-        render json: price_response, status: :ok
-      else
-        # Should not get here but I'm sure there is a way ;-)
-        render json: {
-          errors: [
-            {
-              title: 'Server failed to price the cart :-('
-            }
-          ]
-        }, status: :internal_server_error
-      end
+    # TODO wrap in begin rescue. Should never have this failing as the promocode & cart are valid so throw a 500
+    @cart_pricer = CartPricer.new
+    @discounted_cart = @cart_pricer.price(@cart, @promocode)
+    if @discounted_cart
+      create_discount
+      render json: price_response, status: :ok
+    else
+      # Should not get here but I'm sure there is a way ;-)
+      render json: {
+        errors: [
+          {
+            title: 'Server failed to price the cart :-('
+          }
+        ]
+      }, status: :internal_server_error
     end
   end
 
