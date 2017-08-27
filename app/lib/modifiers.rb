@@ -26,7 +26,8 @@ module Modifiers
 
   end
 
-  class AbsoluteTotalModifier < Modifier
+  # TODO this needs to be implemented
+  class TotalAbsoluteModifier < Modifier
     def apply(cart)
       return cart
     end
