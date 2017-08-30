@@ -9,9 +9,9 @@ module Authorisation
 
     if api_key.nil?
       render json: {
-          errors: {
-              title: 'API key is not valid'
-          }
+        errors: {
+          title: 'API key is not valid'
+        }
       }, status: :unauthorized
     else
       @user = api_key.user
