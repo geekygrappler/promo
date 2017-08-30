@@ -1,4 +1,7 @@
 class PromotionsController < ApplicationController
+  include Authorisation
+
+  before_action :set_user_from_access_token, only: [:destroy]
   def index
     @promotions = current_user.promotions
     render json: @promotions
@@ -14,6 +17,15 @@ class PromotionsController < ApplicationController
   def show
     promotion = Promotion.find(params[:id])
     render json: promotion
+  end
+
+  def destroy
+    promotion = Promotion.find(params[:id])
+    if promotion.user == @user && promotion.destroy
+      render json: promotion, status: :no_content
+    else
+      # TODO some error
+    end
   end
 
   private
