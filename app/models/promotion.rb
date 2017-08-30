@@ -3,7 +3,7 @@ class Promotion < ApplicationRecord
   include Modifiers
 
   belongs_to :user
-  has_many :promocodes
+  has_many :promocodes, dependent: :destroy
   serialize :constraints, Array
   serialize :modifiers, Array
 
