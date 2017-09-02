@@ -219,7 +219,6 @@ describe 'Price endpoint:', type: :request do
       it 'should create a discount recor'
     end
 
-
     describe 'Promotion period constraints on promotions' do
       it 'should prevent a promocode being used after the promotion has ended' do
         @promotion.start_date = (DateTime.now - 20).utc.iso8601
