@@ -15,7 +15,7 @@ class Api::V1::Promocodes::PublicPromocodesController < ApplicationController
     @promocode_validator.validate_generation(@promocode)
 
     if @promocode_validator.valid?
-      if promocode_attributes.nil? || promocode_attributes[:code].empty?
+      if promocode_attributes.nil? || promocode_attributes[:code].nil?
         @promocode.code = @promocode.generate_code
       end
       if @promocode.save

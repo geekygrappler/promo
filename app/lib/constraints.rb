@@ -57,7 +57,7 @@ module Constraints
     def validate_generation(promocode)
       promotion = promocode.promotion
       if !promotion.promocodes.empty?
-        return SinglePromocodeError.new('This promotion is limited to one promocode and already has one')
+        SinglePromocodeError.new('This promotion is limited to one promocode and already has one')
       end
     end
   end

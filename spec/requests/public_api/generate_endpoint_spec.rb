@@ -9,7 +9,7 @@ describe 'Generate endpoint:', type: :request do
   let(:api_key) {ApiKey.create(user: user)}
   let(:authorization_header) {
     {
-      'Authorization': api_key.access_token
+      Authorization: api_key.access_token
     }
   }
   let(:customer_email) {'customer@test.com'}
