@@ -10,7 +10,7 @@ describe 'Price endpoint:', type: :request do
   let(:api_key) {ApiKey.create(user: user)}
   let(:authorization_header) {
     {
-      'Authorization': api_key.access_token
+      Authorization: api_key.access_token
     }
   }
   let(:code) {'xyz123'}
@@ -29,6 +29,35 @@ describe 'Price endpoint:', type: :request do
     )
   end
 
+  describe 'All requests require a cart ID' do
+    it 'should throw an error if the request doesn\'t have a cart ID' do
+      params = {
+        data: {
+          type: 'promocodes',
+          attributes: {
+            code: code
+          },
+          relationships: {
+            cart: {
+              type: 'carts',
+              attributes: {
+                item_total: 27,
+                delivery_total: 7
+              }
+            }
+          }
+        }
+      }
+
+      post '/api/v1/promocodes/price', params: params, headers: authorization_header
+
+      expect(response).to have_http_status(422)
+
+      expect(json['errors'][0]['title'])
+        .to match('Submitted cart must include an ID')
+    end
+  end
+
   describe 'Constraints:' do
     describe 'SpecificCustomer promotions' do
       before(:each) do
@@ -44,6 +73,7 @@ describe 'Price endpoint:', type: :request do
             },
             relationships: {
               cart: {
+                id: 11,
                 type: 'carts',
                 attributes: {
                   item_total: 27,
@@ -76,6 +106,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 99,
                   delivery_total: 9
@@ -101,6 +132,7 @@ describe 'Price endpoint:', type: :request do
             },
             relationships: {
               cart: {
+                id: 11,
                 type: 'carts',
                 attributes: {
                   total: 39
@@ -167,6 +199,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 id: 'CartId',
                 attributes: {
                   total: 39
@@ -202,6 +235,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 27,
                   delivery_total: 7
@@ -231,6 +265,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 27,
                   delivery_total: 7
@@ -262,6 +297,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 60,
                   delivery_total: 7
@@ -290,6 +326,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 60,
                   delivery_total: 6
@@ -323,6 +360,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 100,
                   delivery_total: 13
@@ -358,6 +396,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   delivery_total: 13
                 }
@@ -390,6 +429,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   item_total: 100,
                   delivery_total: 13
@@ -425,6 +465,7 @@ describe 'Price endpoint:', type: :request do
             relationships: {
               cart: {
                 type: 'carts',
+                id: 11,
                 attributes: {
                   total: 113
                 }
